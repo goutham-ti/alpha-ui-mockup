@@ -2915,108 +2915,6 @@ function setRole(role) {
 
 /* ─── INIT ────────────────────────────────────────────────────────── */
 navigate('team');
-
-/* ─── FEEDBACK WIDGET ──────────────────────────────────────────────── */
-(function() {
-  const WEBHOOK = '__GCHAT_WEBHOOK__';
-
-  const btn = document.getElementById('fb-btn');
-  const overlay = document.getElementById('fb-overlay');
-  const closeBtn = document.getElementById('fb-close');
-  const cancelBtn = document.getElementById('fb-cancel');
-  const sendBtn = document.getElementById('fb-send');
-  const textarea = document.getElementById('fb-textarea');
-  const screenshotChk = document.getElementById('fb-screenshot-chk');
-  const status = document.getElementById('fb-status');
-
-  function openModal() { overlay.classList.add('open'); textarea.focus(); }
-  function closeModal() { overlay.classList.remove('open'); textarea.value = ''; status.textContent = ''; sendBtn.disabled = false; }
-
-  btn.addEventListener('click', openModal);
-  closeBtn.addEventListener('click', closeModal);
-  cancelBtn.addEventListener('click', closeModal);
-  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
-
-  async function captureScreenshot() {
-    return new Promise((resolve) => {
-      if (typeof html2canvas === 'undefined') { resolve(null); return; }
-      // Hide overlay before capture
-      overlay.style.display = 'none';
-      requestAnimationFrame(() => {
-        html2canvas(document.body, { useCORS: true, scale: 1, logging: false })
-          .then(canvas => {
-            overlay.style.display = '';
-            canvas.toBlob(blob => resolve(blob), 'image/png', 0.85);
-          })
-          .catch(() => { overlay.style.display = ''; resolve(null); });
-      });
-    });
-  }
-
-  async function uploadScreenshot(blob) {
-    const fd = new FormData();
-    fd.append('file', blob, 'screenshot.png');
-    const res = await fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: fd });
-    const json = await res.json();
-    // tmpfiles returns: { status: 'success', data: { url: 'https://tmpfiles.org/XXXXX/screenshot.png' } }
-    const url = json?.data?.url;
-    if (!url) return null;
-    // Convert viewer URL to direct download URL
-    return url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-  }
-
-  sendBtn.addEventListener('click', async function() {
-    const msg = textarea.value.trim();
-    if (!msg) { textarea.focus(); return; }
-
-    sendBtn.disabled = true;
-    status.textContent = 'Sending…';
-
-    try {
-      let screenshotUrl = null;
-      if (screenshotChk.checked) {
-        status.textContent = 'Capturing screenshot…';
-        const blob = await captureScreenshot();
-        if (blob) {
-          status.textContent = 'Uploading screenshot…';
-          screenshotUrl = await uploadScreenshot(blob);
-        }
-      }
-
-      const page = window.location.href;
-      const widgets = [{
-        textParagraph: { text: '<b>Feedback</b>' }
-      }, {
-        textParagraph: { text: msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-      }, {
-        textParagraph: { text: '<font color="#888888">Page: ' + page + '</font>' }
-      }];
-
-      if (screenshotUrl) {
-        widgets.push({ textParagraph: { text: '<a href="' + screenshotUrl + '">View screenshot</a>' } });
-      }
-
-      const body = {
-        cards: [{
-          header: { title: 'Alpha Mockup Feedback', subtitle: new Date().toLocaleString() },
-          sections: [{ widgets }]
-        }]
-      };
-
-      await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      status.textContent = 'Sent! Thank you.';
-      setTimeout(closeModal, 1500);
-    } catch(e) {
-      status.textContent = 'Error: ' + (e.message || 'Failed to send.');
-      sendBtn.disabled = false;
-    }
-  });
-})();
 </script>
 
 <!-- ─── FEEDBACK BUTTON + MODAL ──────────────────────────────────── -->
@@ -3049,5 +2947,102 @@ navigate('team');
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+/* ─── FEEDBACK WIDGET ──────────────────────────────────────────────── */
+(function() {
+  const WEBHOOK = '__GCHAT_WEBHOOK__';
+
+  const btn = document.getElementById('fb-btn');
+  const overlay = document.getElementById('fb-overlay');
+  const closeBtn = document.getElementById('fb-close');
+  const cancelBtn = document.getElementById('fb-cancel');
+  const sendBtn = document.getElementById('fb-send');
+  const textarea = document.getElementById('fb-textarea');
+  const screenshotChk = document.getElementById('fb-screenshot-chk');
+  const status = document.getElementById('fb-status');
+
+  function openModal() { overlay.classList.add('open'); textarea.focus(); }
+  function closeModal() { overlay.classList.remove('open'); textarea.value = ''; status.textContent = ''; sendBtn.disabled = false; }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+
+  async function captureScreenshot() {
+    return new Promise((resolve) => {
+      if (typeof html2canvas === 'undefined') { resolve(null); return; }
+      overlay.style.display = 'none';
+      requestAnimationFrame(() => {
+        html2canvas(document.body, { useCORS: true, scale: 1, logging: false })
+          .then(canvas => {
+            overlay.style.display = '';
+            canvas.toBlob(blob => resolve(blob), 'image/png', 0.85);
+          })
+          .catch(() => { overlay.style.display = ''; resolve(null); });
+      });
+    });
+  }
+
+  async function uploadScreenshot(blob) {
+    const fd = new FormData();
+    fd.append('file', blob, 'screenshot.png');
+    const res = await fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: fd });
+    const json = await res.json();
+    const url = json?.data?.url;
+    if (!url) return null;
+    return url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+  }
+
+  sendBtn.addEventListener('click', async function() {
+    const msg = textarea.value.trim();
+    if (!msg) { textarea.focus(); return; }
+
+    sendBtn.disabled = true;
+    status.textContent = 'Sending…';
+
+    try {
+      let screenshotUrl = null;
+      if (screenshotChk.checked) {
+        status.textContent = 'Capturing screenshot…';
+        const blob = await captureScreenshot();
+        if (blob) {
+          status.textContent = 'Uploading screenshot…';
+          screenshotUrl = await uploadScreenshot(blob);
+        }
+      }
+
+      const page = window.location.href;
+      const widgets = [
+        { textParagraph: { text: msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') } },
+        { textParagraph: { text: '<font color="#888888">Page: ' + page + '</font>' } }
+      ];
+
+      if (screenshotUrl) {
+        widgets.push({ textParagraph: { text: '<a href="' + screenshotUrl + '">View screenshot</a>' } });
+      }
+
+      const body = {
+        cards: [{
+          header: { title: 'Alpha Mockup Feedback', subtitle: new Date().toLocaleString() },
+          sections: [{ widgets }]
+        }]
+      };
+
+      await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      status.textContent = 'Sent! Thank you.';
+      setTimeout(closeModal, 1500);
+    } catch(e) {
+      status.textContent = 'Error: ' + (e.message || 'Failed to send.');
+      sendBtn.disabled = false;
+    }
+  });
+})();
+</script>
 </body>
 </html>
