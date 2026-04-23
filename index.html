@@ -2139,6 +2139,22 @@ function renderInsightsPanel() {
             <div style="font-size:12px;font-weight:700;min-width:36px;color:${me.passRate>=75?'var(--pass)':me.passRate>=55?'var(--needs)':'var(--fail)'}">${me.passRate}%</div>
           </div>
         </div>
+
+        <div class="chart-box">
+          <div class="chart-title">QC Pass Rate — Team Average</div>
+          <div class="chart-sub">Overall benchmark across all coaches</div>
+          <svg class="chart-area" viewBox="0 0 ${W} ${H}" style="height:${H}px">
+            ${yAxisLines(H, cH)}
+            ${axisLabels(weekLabels, W, H)}
+            ${svgLine(overallTrend,'#6366f1',W,cH,true)}
+            ${overallTrend.map((v,i)=>{
+              const x=(i/(overallTrend.length-1))*(W-2)+1;
+              const mn=Math.min(...overallTrend),mx=Math.max(...overallTrend),rng=mx-mn||1;
+              const y=cH-4-((v-mn)/rng)*(cH-12)+2;
+              return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#6366f1"/>`;
+            }).join('')}
+          </svg>
+        </div>
       `;
       return;
     }
