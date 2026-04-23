@@ -972,6 +972,75 @@
     .form-input { width:100%; font-size:13px; padding:10px 14px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); outline:none; box-sizing:border-box; }
     .form-input:focus { border-color:var(--text); }
     .drop-zone-text { font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; }
+
+    /* ─── FEEDBACK WIDGET ──────────────────────────────────────────── */
+    #fb-btn {
+      position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+      display: flex; align-items: center; gap: 7px;
+      background: var(--text); color: #fff;
+      font-family: var(--font-body); font-size: 13px; font-weight: 600;
+      padding: 10px 16px; border-radius: 100px; border: none;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.18);
+      transition: transform .15s, box-shadow .15s;
+    }
+    #fb-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,.22); }
+    #fb-btn svg { flex-shrink: 0; }
+
+    #fb-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1001;
+      background: rgba(0,0,0,.35); backdrop-filter: blur(3px);
+      align-items: flex-end; justify-content: flex-end;
+      padding: 24px;
+    }
+    #fb-overlay.open { display: flex; }
+
+    #fb-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      animation: fb-slide-in .2s ease;
+      overflow: hidden;
+    }
+    @keyframes fb-slide-in {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #fb-modal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    #fb-modal-head h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+    #fb-close {
+      background: none; border: none; cursor: pointer; color: var(--text2);
+      font-size: 18px; line-height: 1; padding: 2px; border-radius: 4px;
+    }
+    #fb-close:hover { color: var(--text); background: var(--surface2); }
+    #fb-modal-body { padding: 20px; }
+    #fb-textarea {
+      width: 100%; font-family: var(--font-body); font-size: 13px;
+      padding: 10px 12px; border: 1px solid var(--border2); border-radius: 8px;
+      background: var(--surface2); color: var(--text);
+      resize: none; min-height: 96px; outline: none; box-sizing: border-box;
+      line-height: 1.5;
+    }
+    #fb-textarea:focus { border-color: var(--text); }
+    #fb-screenshot-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 12px; font-size: 12px; color: var(--text2);
+    }
+    #fb-screenshot-row input[type=checkbox] { cursor: pointer; }
+    #fb-actions { display: flex; gap: 10px; margin-top: 16px; }
+    #fb-cancel { flex: 1; padding: 9px; border: 1px solid var(--border2); border-radius: 8px; background: none; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; }
+    #fb-cancel:hover { background: var(--surface2); }
+    #fb-send {
+      flex: 2; padding: 9px; border: none; border-radius: 8px;
+      background: var(--text); color: #fff;
+      font-family: var(--font-body); font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: opacity .15s;
+    }
+    #fb-send:hover { opacity: .85; }
+    #fb-send:disabled { opacity: .5; cursor: default; }
+    #fb-status { font-size: 12px; color: var(--text2); margin-top: 10px; min-height: 16px; }
   </style>
 </head>
 <body>
@@ -1994,7 +2063,6 @@ function renderInsights() {
     </div>
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
-      <button class="ins-tab ${insightsSubTab==='trends'?'active':''}" onclick="switchInsightsTab('trends')">Trends</button>
       <button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>
       <button class="ins-tab ${insightsSubTab==='lastcall'?'active':''}" onclick="switchInsightsTab('lastcall')">Last Call</button>
       <button class="ins-tab ${insightsSubTab==='students'?'active':''}" onclick="switchInsightsTab('students')">Students</button>
@@ -2137,6 +2205,23 @@ function renderInsightsPanel() {
           </div>
           <div id="ov-trend-legend" style="min-width:160px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding-top:4px"></div>
         </div>
+      </div>
+
+      <!-- Row 3: Team Average SVG line chart -->
+      <div class="chart-box">
+        <div class="chart-title">QC Pass Rate — Team Average</div>
+        <div class="chart-sub">Overall quality benchmark across all coaches</div>
+        <svg class="chart-area" viewBox="0 0 680 180" style="height:180px">
+          ${yAxisLines(180, 160)}
+          ${axisLabels(weekLabels, 680, 180)}
+          ${svgLine(overallTrend,'#6366f1',680,160,true)}
+          ${overallTrend.map((v,i)=>{
+            const x=(i/(overallTrend.length-1))*(680-2)+1;
+            const mn=Math.min(...overallTrend),mx=Math.max(...overallTrend),rng=mx-mn||1;
+            const y=160-4-((v-mn)/rng)*(160-12)+2;
+            return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.5" fill="#6366f1"/>';
+          }).join('')}
+        </svg>
       </div>
     `;
 
@@ -2289,149 +2374,6 @@ function renderInsightsPanel() {
             ds.pointRadius = 4;
           });
           trendChart.update('none');
-          this.style.background = '';
-        });
-      });
-    })();
-  }
-
-  else if (insightsSubTab === 'trends') {
-    const W=680, H=180, cH=160;
-    const colors = ['#0d9488','#1d4ed8','#4338ca','#7c3aed','#0891b2','#9a3412'];
-
-    if (isCoach) {
-      // Coach view: only show their own trend line vs team average
-      el.innerHTML = `
-        <div class="chart-box" style="margin-bottom:20px">
-          <div class="chart-title">Your Pass Rate — 8 Week Trend</div>
-          <div class="chart-sub">Your personal QC pass rate over time</div>
-          <svg class="chart-area" viewBox="0 0 ${W} ${H}" style="height:${H}px">
-            ${yAxisLines(H, cH)}
-            ${axisLabels(weekLabels, W, H)}
-            ${svgLine(me.trend, me.color, W, cH, false)}
-            ${me.trend.map((v,j)=>{
-              const x=(j/(me.trend.length-1))*(W-2)+1;
-              const mn=Math.min(...me.trend),mx=Math.max(...me.trend),rng=mx-mn||1;
-              const y=cH-4-((v-mn)/rng)*(cH-12)+2;
-              return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${me.color}" stroke="white" stroke-width="1.5"/>`;
-            }).join('')}
-          </svg>
-        </div>
-
-        <div class="chart-box">
-          <div class="chart-title">Team Average — for Reference</div>
-          <div class="chart-sub">Overall benchmark across all coaches</div>
-          <svg class="chart-area" viewBox="0 0 ${W} ${H}" style="height:${H}px">
-            ${yAxisLines(H, cH)}
-            ${axisLabels(weekLabels, W, H)}
-            ${svgLine(overallTrend,'#6366f1',W,cH,true)}
-            ${overallTrend.map((v,i)=>{
-              const x=(i/(overallTrend.length-1))*(W-2)+1;
-              const mn=Math.min(...overallTrend),mx=Math.max(...overallTrend),rng=mx-mn||1;
-              const y=cH-4-((v-mn)/rng)*(cH-12)+2;
-              return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#6366f1"/>`;
-            }).join('')}
-          </svg>
-        </div>
-      `;
-      return;
-    }
-
-    el.innerHTML = `
-      <div class="chart-box" style="margin-bottom:20px">
-        <div class="chart-title">Pass Rate by Coach Over Time</div>
-        <div class="chart-sub">Hover a name to highlight that coach's trend</div>
-        <div style="display:flex;gap:20px;align-items:flex-start">
-          <div style="flex:1;min-width:0;height:300px">
-            <canvas id="trends-coach-trend"></canvas>
-          </div>
-          <div id="trends-trend-legend" style="min-width:160px;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding-top:4px"></div>
-        </div>
-      </div>
-
-      <div class="chart-box">
-        <div class="chart-title">QC Pass Rate — Team Average</div>
-        <div class="chart-sub">Overall quality benchmark across all coaches</div>
-        <svg class="chart-area" viewBox="0 0 ${W} ${H}" style="height:${H}px">
-          ${yAxisLines(H, cH)}
-          ${axisLabels(weekLabels, W, H)}
-          ${svgLine(overallTrend,'#6366f1',W,cH,true)}
-          ${overallTrend.map((v,i)=>{
-            const x=(i/(overallTrend.length-1))*(W-2)+1;
-            const mn=Math.min(...overallTrend),mx=Math.max(...overallTrend),rng=mx-mn||1;
-            const y=cH-4-((v-mn)/rng)*(cH-12)+2;
-            return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#6366f1"/>`;
-          }).join('')}
-        </svg>
-      </div>
-    `;
-
-    (function() {
-      function tLineColor(pct, alpha) {
-        alpha = alpha == null ? 1 : alpha;
-        if (pct >= 80) return 'rgba(16,185,129,' + alpha + ')';
-        if (pct >= 60) return 'rgba(245,158,11,' + alpha + ')';
-        return 'rgba(239,68,68,' + alpha + ')';
-      }
-      const DIM_C = 'rgba(200,210,220,0.25)', DIM_B = 'rgba(180,190,200,0.3)';
-      const ds = coaches.map(c => ({
-        label: c.name,
-        _basePct: c.passRate,
-        _baseColor: tLineColor(c.passRate, 1),
-        data: c.trend,
-        borderColor: tLineColor(c.passRate, 0.4),
-        backgroundColor: 'transparent',
-        pointBackgroundColor: tLineColor(c.passRate, 0.4),
-        pointBorderColor: 'transparent',
-        borderWidth: 1.5, pointRadius: 4, pointHoverRadius: 6,
-        tension: 0.3, spanGaps: true
-      }));
-      const tc = new Chart(document.getElementById('trends-coach-trend'), {
-        type: 'line',
-        data: { labels: weekLabels, datasets: ds },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          interaction: { mode: 'nearest', intersect: false },
-          scales: {
-            x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } },
-            y: {
-              min: -3, max: 103,
-              ticks: { color: '#71717a', stepSize: 20, callback: v => (v < 0 || v > 100) ? '' : v + '%' },
-              grid: {
-                color: ctx => (ctx.tick.value === 0 || ctx.tick.value === 100) ? '#09090b' : '#f4f4f5',
-                lineWidth: ctx => (ctx.tick.value === 0 || ctx.tick.value === 100) ? 2 : 1
-              }
-            }
-          },
-          plugins: { legend: { display: false } }
-        }
-      });
-      const leg = document.getElementById('trends-trend-legend');
-      leg.innerHTML = coaches.map(c => {
-        const col = tLineColor(c.passRate, 1);
-        return '<div class="ov-legend-item" data-coach="' + c.name + '"' +
-          ' style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:default;transition:background 0.15s">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + col + ';flex-shrink:0;display:inline-block"></span>' +
-          '<span style="font-size:12px;color:#3f3f46;white-space:nowrap">' + c.name.split(' ')[0] + '</span>' +
-          '<span style="font-size:12px;color:' + col + ';font-weight:700;margin-left:auto;padding-left:8px">' + c.passRate + '%</span>' +
-          '</div>';
-      }).join('');
-      leg.querySelectorAll('.ov-legend-item').forEach(item => {
-        item.addEventListener('mouseenter', function() {
-          const h = this.dataset.coach;
-          tc.data.datasets.forEach(d => {
-            if (d.label === h) { d.borderColor = d._baseColor; d.pointBackgroundColor = d._baseColor; d.borderWidth = 3; d.pointRadius = 6; }
-            else { d.borderColor = DIM_C; d.pointBackgroundColor = DIM_B; d.borderWidth = 1; d.pointRadius = 2; }
-          });
-          tc.update('none');
-          this.style.background = '#f4f4f5';
-        });
-        item.addEventListener('mouseleave', function() {
-          tc.data.datasets.forEach(d => {
-            d.borderColor = tLineColor(d._basePct, 0.4); d.pointBackgroundColor = tLineColor(d._basePct, 0.4);
-            d.borderWidth = 1.5; d.pointRadius = 4;
-          });
-          tc.update('none');
           this.style.background = '';
         });
       });
@@ -2957,6 +2899,139 @@ function setRole(role) {
 
 /* ─── INIT ────────────────────────────────────────────────────────── */
 navigate('team');
+
+/* ─── FEEDBACK WIDGET ──────────────────────────────────────────────── */
+(function() {
+  const WEBHOOK = '__GCHAT_WEBHOOK__';
+
+  const btn = document.getElementById('fb-btn');
+  const overlay = document.getElementById('fb-overlay');
+  const closeBtn = document.getElementById('fb-close');
+  const cancelBtn = document.getElementById('fb-cancel');
+  const sendBtn = document.getElementById('fb-send');
+  const textarea = document.getElementById('fb-textarea');
+  const screenshotChk = document.getElementById('fb-screenshot-chk');
+  const status = document.getElementById('fb-status');
+
+  function openModal() { overlay.classList.add('open'); textarea.focus(); }
+  function closeModal() { overlay.classList.remove('open'); textarea.value = ''; status.textContent = ''; sendBtn.disabled = false; }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+
+  async function captureScreenshot() {
+    return new Promise((resolve) => {
+      if (typeof html2canvas === 'undefined') { resolve(null); return; }
+      // Hide overlay before capture
+      overlay.style.display = 'none';
+      requestAnimationFrame(() => {
+        html2canvas(document.body, { useCORS: true, scale: 1, logging: false })
+          .then(canvas => {
+            overlay.style.display = '';
+            canvas.toBlob(blob => resolve(blob), 'image/png', 0.85);
+          })
+          .catch(() => { overlay.style.display = ''; resolve(null); });
+      });
+    });
+  }
+
+  async function uploadScreenshot(blob) {
+    const fd = new FormData();
+    fd.append('file', blob, 'screenshot.png');
+    const res = await fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: fd });
+    const json = await res.json();
+    // tmpfiles returns: { status: 'success', data: { url: 'https://tmpfiles.org/XXXXX/screenshot.png' } }
+    const url = json?.data?.url;
+    if (!url) return null;
+    // Convert viewer URL to direct download URL
+    return url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+  }
+
+  sendBtn.addEventListener('click', async function() {
+    const msg = textarea.value.trim();
+    if (!msg) { textarea.focus(); return; }
+
+    sendBtn.disabled = true;
+    status.textContent = 'Sending…';
+
+    try {
+      let screenshotUrl = null;
+      if (screenshotChk.checked) {
+        status.textContent = 'Capturing screenshot…';
+        const blob = await captureScreenshot();
+        if (blob) {
+          status.textContent = 'Uploading screenshot…';
+          screenshotUrl = await uploadScreenshot(blob);
+        }
+      }
+
+      const page = window.location.href;
+      const widgets = [{
+        textParagraph: { text: '<b>Feedback</b>' }
+      }, {
+        textParagraph: { text: msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+      }, {
+        textParagraph: { text: '<font color="#888888">Page: ' + page + '</font>' }
+      }];
+
+      if (screenshotUrl) {
+        widgets.push({ textParagraph: { text: '<a href="' + screenshotUrl + '">View screenshot</a>' } });
+      }
+
+      const body = {
+        cards: [{
+          header: { title: 'Alpha Mockup Feedback', subtitle: new Date().toLocaleString() },
+          sections: [{ widgets }]
+        }]
+      };
+
+      await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      status.textContent = 'Sent! Thank you.';
+      setTimeout(closeModal, 1500);
+    } catch(e) {
+      status.textContent = 'Error: ' + (e.message || 'Failed to send.');
+      sendBtn.disabled = false;
+    }
+  });
+})();
 </script>
+
+<!-- ─── FEEDBACK BUTTON + MODAL ──────────────────────────────────── -->
+<button id="fb-btn" title="Send feedback">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+  Feedback
+</button>
+
+<div id="fb-overlay">
+  <div id="fb-modal">
+    <div id="fb-modal-head">
+      <h3>Send Feedback</h3>
+      <button id="fb-close" title="Close">&times;</button>
+    </div>
+    <div id="fb-modal-body">
+      <textarea id="fb-textarea" placeholder="Describe what you'd like to share or report…"></textarea>
+      <div id="fb-screenshot-row">
+        <input type="checkbox" id="fb-screenshot-chk" checked>
+        <label for="fb-screenshot-chk">Include a screenshot of this page</label>
+      </div>
+      <div id="fb-actions">
+        <button id="fb-cancel">Cancel</button>
+        <button id="fb-send">Send feedback</button>
+      </div>
+      <div id="fb-status"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </body>
 </html>
