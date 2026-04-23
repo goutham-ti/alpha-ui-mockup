@@ -2098,6 +2098,11 @@ let activeCoachFilters = new Set(coaches.map(c=>c.id));
 let insightsSubTab = 'overview';
 let insightsDateFrom = '2026-02-25';
 let insightsDateTo   = '2026-04-23';
+let adminTrendMode = 'wk';
+function setAdminTrend(mode) {
+  adminTrendMode = mode;
+  renderInsightsPanel();
+}
 
 function setInsightsDate(field, val) {
   if (field === 'from') insightsDateFrom = val;
@@ -2342,21 +2347,67 @@ function renderInsightsPanel() {
         </div>
       </div>
 
-      <!-- Row 3: Team Average SVG line chart -->
+      <!-- Row 3: Sessions per coach + Join rate (admin only) -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">Sessions per Coach</div>
+          <div class="chart-sub">Joined vs no-show</div>
+          <div style="height:220px"><canvas id="adm-sess-bar"></canvas></div>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">Join Rate</div>
+          <div style="position:relative;height:160px;display:flex;align-items:center;justify-content:center">
+            <canvas id="adm-join-donut"></canvas>
+            <div style="position:absolute;text-align:center;pointer-events:none">
+              <div style="font-size:20px;font-weight:700;color:var(--text)">84%</div>
+              <div style="font-size:11px;color:var(--text2)">Joined</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Call type donut + Calls by subject -->
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">Call Type Breakdown</div>
+          <div style="position:relative;height:190px;display:flex;align-items:center;justify-content:center">
+            <canvas id="adm-calltype-donut"></canvas>
+          </div>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">Calls by Subject</div>
+          <div class="chart-sub">Top subjects coached this period</div>
+          <div style="height:190px"><canvas id="adm-subject-bar"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Row 5: App usage + Calls by campus -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">App Usage</div>
+          <div class="chart-sub">Student-reported app during session</div>
+          <div style="height:220px"><canvas id="adm-app-bar"></canvas></div>
+        </div>
+        <div class="chart-box" style="margin-bottom:0">
+          <div class="chart-title">Calls by Campus</div>
+          <div class="chart-sub">Top campuses by session volume</div>
+          <div style="height:220px"><canvas id="adm-campus-bar"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Row 6: Calls over time -->
       <div class="chart-box">
-        <div class="chart-title">QC Pass Rate — Team Average</div>
-        <div class="chart-sub">Overall quality benchmark across all coaches</div>
-        <svg class="chart-area" viewBox="0 0 680 180" style="height:180px">
-          ${yAxisLines(180, 160)}
-          ${axisLabels(weekLabels, 680, 180)}
-          ${svgLine(overallTrend,'#6366f1',680,160,true)}
-          ${overallTrend.map((v,i)=>{
-            const x=(i/(overallTrend.length-1))*(680-2)+1;
-            const mn=Math.min(...overallTrend),mx=Math.max(...overallTrend),rng=mx-mn||1;
-            const y=160-4-((v-mn)/rng)*(160-12)+2;
-            return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.5" fill="#6366f1"/>';
-          }).join('')}
-        </svg>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div>
+            <div class="chart-title" style="margin-bottom:2px">Calls Over Time</div>
+            <div class="chart-sub" style="margin-bottom:0">Session volume trend</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button onclick="setAdminTrend('wk')" style="padding:3px 10px;font-size:11px;border-radius:5px;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:${adminTrendMode==='wk'?'var(--text)':'transparent'};color:${adminTrendMode==='wk'?'var(--bg)':'var(--text2)'}">Weekly</button>
+            <button onclick="setAdminTrend('mo')" style="padding:3px 10px;font-size:11px;border-radius:5px;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:${adminTrendMode==='mo'?'var(--text)':'transparent'};color:${adminTrendMode==='mo'?'var(--bg)':'var(--text2)'}">Monthly</button>
+          </div>
+        </div>
+        <div style="height:190px"><canvas id="adm-trend-chart"></canvas></div>
       </div>
     `;
 
@@ -2511,6 +2562,132 @@ function renderInsightsPanel() {
           trendChart.update('none');
           this.style.background = '';
         });
+      });
+    })();
+
+    // ── Admin: Sessions per coach ─────────────────────────────────
+    (function() {
+      const joined = coaches.map(c => Math.round(c.totalSessions * 0.84));
+      const noShow = coaches.map(c => c.totalSessions - Math.round(c.totalSessions * 0.84));
+      new Chart(document.getElementById('adm-sess-bar'), {
+        type: 'bar',
+        data: {
+          labels: coaches.map(c => c.name.split(' ')[0]),
+          datasets: [
+            { label: 'Joined',  data: joined,  backgroundColor: '#10b981', stack: 's', borderRadius: { topRight:3, bottomRight:3 }, borderSkipped: false },
+            { label: 'No-show', data: noShow,  backgroundColor: '#ef4444', stack: 's', borderRadius: 0, borderSkipped: false }
+          ]
+        },
+        options: {
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } },
+            y: { stacked: true, ticks: { color: '#71717a', font: { size: 11 } }, grid: { display: false } }
+          },
+          plugins: { legend: { labels: { color: '#71717a', font: { family: 'Inter', size: 11 }, padding: 12 } } }
+        }
+      });
+      const totalJoined = joined.reduce((s,v)=>s+v,0);
+      const totalNoShow = noShow.reduce((s,v)=>s+v,0);
+      new Chart(document.getElementById('adm-join-donut'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Joined','No-show'],
+          datasets: [{ data: [totalJoined, totalNoShow], backgroundColor: ['#10b981','#ef4444'], borderWidth: 0, hoverOffset: 5 }]
+        },
+        options: {
+          cutout: '68%',
+          plugins: { legend: { labels: { color: '#71717a', font: { family: 'Inter', size: 11 }, padding: 12 } } }
+        }
+      });
+    })();
+
+    // ── Admin: Call type donut ────────────────────────────────────
+    new Chart(document.getElementById('adm-calltype-donut'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Academic','Post-test','Pre-test','Proctoring'],
+        datasets: [{ data: [142,67,45,28], backgroundColor: ['#2d8653','#1d4ed8','#d97706','#7c3aed'], borderWidth: 0, hoverOffset: 5 }]
+      },
+      options: {
+        cutout: '55%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#71717a', font: { family: 'Inter', size: 11 }, padding: 10, boxWidth: 10 } } }
+      }
+    });
+
+    // ── Admin: Calls by subject ───────────────────────────────────
+    new Chart(document.getElementById('adm-subject-bar'), {
+      type: 'bar',
+      data: {
+        labels: ['Mathematics','Reading','Writing','Science','History','Language Arts','Social Studies','Spanish'],
+        datasets: [{ label: 'Calls', data: [89,76,61,54,43,38,31,22], backgroundColor: '#2d8653', borderRadius: 4, borderSkipped: false }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } },
+          y: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // ── Admin: App usage ──────────────────────────────────────────
+    new Chart(document.getElementById('adm-app-bar'), {
+      type: 'bar',
+      data: {
+        labels: ['Khan Academy','IXL','ST Math','Lexia','Prodigy','Google Docs','Scratch','Duolingo'],
+        datasets: [{ label: 'Sessions', data: [112,94,78,65,52,41,33,27], backgroundColor: '#1d4ed8', borderRadius: 4, borderSkipped: false }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } },
+          y: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // ── Admin: Calls by campus ────────────────────────────────────
+    new Chart(document.getElementById('adm-campus-bar'), {
+      type: 'bar',
+      data: {
+        labels: ['Austin Central','Austin North','San Antonio','Houston','Dallas','Plano','Round Rock','Cedar Park','Georgetown','Pflugerville'],
+        datasets: [{ label: 'Sessions', data: [87,74,68,61,55,49,43,38,31,27], backgroundColor: '#0891b2', borderRadius: 4, borderSkipped: false }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } },
+          y: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    // ── Admin: Calls over time ────────────────────────────────────
+    (function() {
+      const wkLabels = ['Feb 25','Mar 4','Mar 11','Mar 18','Mar 25','Apr 1','Apr 8','Apr 15'];
+      const wkData   = [38,42,47,44,51,53,49,56];
+      const moLabels = ['Nov','Dec','Jan','Feb','Mar','Apr'];
+      const moData   = [156,142,178,165,193,210];
+      const labels = adminTrendMode === 'mo' ? moLabels : wkLabels;
+      const data   = adminTrendMode === 'mo' ? moData   : wkData;
+      new Chart(document.getElementById('adm-trend-chart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: 'Sessions', data, backgroundColor: '#2d8653', borderRadius: 4 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { display: false } },
+            y: { beginAtZero: true, ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: '#f4f4f5' } }
+          },
+          plugins: { legend: { display: false } }
+        }
       });
     })();
   }
