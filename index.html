@@ -1539,6 +1539,26 @@ let state = {
 const coachMe = coaches[1]; // Sarah Chen as the logged-in coach
 
 /* ─── HELPERS ───────────────────────────────────────────────────── */
+const MONTH_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseSessionDate(dateStr) {
+  // Handles "Apr 21" or "Apr 21, 2026"
+  const clean = dateStr.replace(',','').trim().split(/\s+/);
+  const month = MONTH_MAP[clean[0]];
+  const day = parseInt(clean[1]);
+  const year = clean[2] ? parseInt(clean[2]) : 2026;
+  return new Date(year, month, day);
+}
+function filterSessionsByDate(sessions) {
+  const from = insightsDateFrom ? new Date(insightsDateFrom + 'T00:00:00') : null;
+  const to   = insightsDateTo   ? new Date(insightsDateTo   + 'T23:59:59') : null;
+  return sessions.filter(s => {
+    const d = parseSessionDate(s.date);
+    if (from && d < from) return false;
+    if (to   && d > to)   return false;
+    return true;
+  });
+}
+
 function gradeClass(grade) {
   if (grade === 'PASS') return 'pass';
   if (grade === 'FAIL') return 'fail';
@@ -2528,7 +2548,7 @@ function renderInsights() {
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
       ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>` : ''}
-      <button class="ins-tab ${insightsSubTab==='lastcall'?'active':''}" onclick="switchInsightsTab('lastcall')">Last Call</button>
+      ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='lastcall'?'active':''}" onclick="switchInsightsTab('lastcall')">Last Call</button>` : ''}
       <button class="ins-tab ${insightsSubTab==='students'?'active':''}" onclick="switchInsightsTab('students')">Students</button>
     </div>
     <div id="ins-panel"></div>
@@ -2547,27 +2567,45 @@ function renderInsightsPanel() {
     const W=680, H=160, cH=140;
 
     if (isCoach) {
-      // Coach view: show only their own stats
-      const myPass = Math.round(me.totalSessions * (me.passRate / 100));
-      const myFail = me.totalSessions - myPass;
+      // Coach view: compute stats from date-filtered sessions
+      const mySessions = filterSessionsByDate(me.sessions);
+      const myPass = mySessions.filter(s => s.grade === 'PASS').length;
+      const myFail = mySessions.filter(s => s.grade === 'FAIL').length;
+      const myTotal = mySessions.length;
+      const myPassRate = myTotal ? Math.round((myPass / myTotal) * 100) : 0;
+      // Most recent session in filtered range
+      const mostRecent = mySessions[0] || null;
       el.innerHTML = `
         <div class="kpi-strip" style="grid-template-columns:repeat(3,1fr)">
           <div class="kpi">
             <div class="kpi-lbl">Your Sessions</div>
-            <div class="kpi-val">${me.totalSessions}</div>
-            <div class="kpi-hint">All time</div>
+            <div class="kpi-val">${myTotal}</div>
+            <div class="kpi-hint">${fmtDateRange(insightsDateFrom, insightsDateTo)}</div>
           </div>
           <div class="kpi">
-            <div class="kpi-lbl">Your Pass Rate</div>
-            <div class="kpi-val pass-color">${me.passRate}%</div>
-            <div class="kpi-hint">+${me.trend[me.trend.length-1]-me.trend[0]} pts vs 8 weeks ago</div>
+            <div class="kpi-lbl">Pass</div>
+            <div class="kpi-val pass-color">${myPass}</div>
+            <div class="kpi-hint">${myTotal ? myPassRate + '% pass rate' : '—'}</div>
           </div>
           <div class="kpi">
-            <div class="kpi-lbl">This Week</div>
-            <div class="kpi-val">${me.weekSessions}</div>
-            <div class="kpi-hint">Sessions recorded</div>
+            <div class="kpi-lbl">Fail</div>
+            <div class="kpi-val" style="color:var(--fail)">${myFail}</div>
+            <div class="kpi-hint">${myTotal ? (100 - myPassRate) + '% of sessions' : '—'}</div>
           </div>
         </div>
+
+        ${mostRecent ? `
+        <div style="margin-bottom:16px">
+          <div class="section-head" style="margin-bottom:10px">Most Recent Session</div>
+          <div class="lc-card" style="cursor:pointer;max-width:480px" onclick="navigate('recording','${me.id}','${mostRecent.id}')">
+            <div class="lc-av" style="background:${me.color}">${me.initials}</div>
+            <div style="flex:1">
+              <div class="lc-name">${mostRecent.title}</div>
+              <div class="lc-date">${mostRecent.student} · ${mostRecent.date} · ${mostRecent.dur}</div>
+            </div>
+            <div class="lc-grade">${gradePill(mostRecent.grade)}</div>
+          </div>
+        </div>` : `<div style="font-size:13px;color:var(--text2);margin-bottom:16px">No sessions in this date range.</div>`}
 
         <div class="chart-row">
           <div class="chart-box full">
@@ -2589,18 +2627,18 @@ function renderInsightsPanel() {
         </div>
 
         <div style="margin-bottom:16px">
-          <div class="section-head">Your Sessions — Pass / Fail Breakdown</div>
+          <div class="section-head">Pass / Fail Breakdown</div>
           <div style="display:flex;align-items:center;gap:12px;padding:14px 0">
             <div style="display:flex;align-items:center;gap:8px;min-width:160px">
               <div style="width:28px;height:28px;border-radius:50%;background:${me.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">${me.initials}</div>
               <span style="font-size:13px;font-weight:600;color:var(--text)">${me.name}</span>
             </div>
             <div style="flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
-              <div style="height:100%;width:${me.passRate}%;background:var(--pass);border-radius:5px"></div>
+              <div style="height:100%;width:${myTotal ? myPassRate : 0}%;background:var(--pass);border-radius:5px"></div>
             </div>
             <div style="font-size:12px;font-weight:600;color:var(--pass);min-width:28px">${myPass}✓</div>
             <div style="font-size:12px;font-weight:600;color:var(--fail);min-width:28px">${myFail}✗</div>
-            <div style="font-size:12px;font-weight:700;min-width:36px;color:${me.passRate>=75?'var(--pass)':me.passRate>=55?'var(--needs)':'var(--fail)'}">${me.passRate}%</div>
+            <div style="font-size:12px;font-weight:700;min-width:36px;color:${myPassRate>=75?'var(--pass)':myPassRate>=55?'var(--needs)':'var(--fail)'}">${myTotal ? myPassRate + '%' : '—'}</div>
           </div>
         </div>
 
