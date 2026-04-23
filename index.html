@@ -957,11 +957,27 @@
     .student-stat-lbl { font-size:11px; color:var(--text2); margin-top:1px; }
     .student-engagement-bar { margin-top:8px; }
 
-    /* ─── TRACKER TABLE ─────────────────────────────────────────── */
-    .tracker-header-row { display:grid; grid-template-columns:1fr 2fr 1fr 80px 80px 1fr 1.5fr; gap:0; padding:10px 18px; background:var(--surface2); border-bottom:1px solid var(--border); font-size:11px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.04em; }
-    .tracker-row { display:grid; grid-template-columns:1fr 2fr 1fr 80px 80px 1fr 1.5fr; gap:0; padding:12px 18px; border-bottom:1px solid var(--border); align-items:center; font-size:13px; }
-    .tracker-row:last-child { border-bottom:none; }
-    .tracker-row:hover { background:var(--surface2); }
+    /* ─── TRACKER ───────────────────────────────────────────────── */
+    .tracker-tbl { width:100%; border-collapse:collapse; }
+    .tracker-tbl th { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text2); padding:8px 12px; text-align:left; border-bottom:1px solid var(--border); background:var(--surface2); }
+    .tracker-tbl td { font-size:13px; padding:10px 12px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
+    .tracker-tbl tr:last-child td { border-bottom:none; }
+    .tracker-tbl tr:hover td { background:var(--surface2); }
+    .tracker-health { border:1px solid var(--border); border-radius:12px; background:var(--surface2); padding:16px; margin-bottom:16px; }
+    .tracker-health-hdr { display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:12px; }
+    .tracker-tiles { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+    .tracker-tile { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; cursor:default; }
+    .tracker-tile-lbl { font-size:11px; color:var(--text2); font-weight:500; margin-bottom:2px; }
+    .tracker-tile-val { font-size:20px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; }
+    .tracker-buckets { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .tracker-bucket { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+    .tracker-bucket-badge { display:inline-block; border-radius:20px; padding:2px 8px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+    .tracker-bucket-desc { font-size:12px; color:var(--text2); line-height:1.45; }
+    .filter-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .filter-chip { cursor:pointer; border:1px solid var(--border2); border-radius:20px; padding:4px 12px; font-size:12px; font-weight:500; color:var(--text2); background:var(--surface); transition:all .15s; user-select:none; }
+    .filter-chip:hover { border-color:var(--text); color:var(--text); }
+    .filter-chip.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+    .tracker-section-hdr { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; }
 
     /* ─── COMPARISONS ───────────────────────────────────────────── */
     .comparison-card:hover { border-color:var(--accent); }
@@ -1384,15 +1400,25 @@ const benchmarkSessionId = 'p1';
 let overrides = {};
 
 const trackerRows = [
-  {id:'tr1',coach:'Priya Nair',title:'Algebraic Thinking',date:'Apr 21',status:'done',grade:'PASS',duration:'48m',ingestedAt:'Apr 21 14:03'},
-  {id:'tr2',coach:'Sarah Chen',title:'Creative Writing',date:'Apr 21',status:'done',grade:'PASS',duration:'45m',ingestedAt:'Apr 21 14:10'},
-  {id:'tr3',coach:'Marcus Johnson',title:'Math Fundamentals',date:'Apr 19',status:'error',grade:'FAIL',duration:'40m',error:'Social Toolkit timeout'},
-  {id:'tr4',coach:'Tom Wright',title:'Math Session',date:'Apr 20',status:'done',grade:'FAIL',duration:'35m',ingestedAt:'Apr 20 09:42'},
-  {id:'tr5',coach:'Raj Patel',title:'Writing Skills',date:'Apr 21',status:'running',grade:null,duration:'49m'},
-  {id:'tr6',coach:'Aisha Lewis',title:'History Discussion',date:'Apr 20',status:'done',grade:'PASS',duration:'43m',ingestedAt:'Apr 20 10:18'},
-  {id:'tr7',coach:'Sarah Chen',title:'Science Inquiry',date:'Apr 14',status:'done',grade:'FAIL',duration:'38m',ingestedAt:'Apr 14 11:55'},
-  {id:'tr8',coach:'Priya Nair',title:'Geometry Basics',date:'Apr 15',status:'queued',grade:null,duration:'51m'},
+  {id:'tr1', rowNumber:2,  coach:'Priya Nair',     studentName:'Emma S.',      date:'2025-04-21', status:'done',      attempts:1, lastError:null, errorClass:null},
+  {id:'tr2', rowNumber:3,  coach:'Sarah Chen',     studentName:'Liam T.',      date:'2025-04-21', status:'done',      attempts:1, lastError:null, errorClass:null},
+  {id:'tr3', rowNumber:4,  coach:'Marcus Johnson', studentName:'Olivia R.',    date:'2025-04-19', status:'failed',    attempts:3, lastError:'Social Toolkit timeout after 30s', errorClass:'stk-timeout'},
+  {id:'tr4', rowNumber:5,  coach:'Tom Wright',     studentName:'Noah K.',      date:'2025-04-20', status:'done',      attempts:1, lastError:null, errorClass:null},
+  {id:'tr5', rowNumber:6,  coach:'Raj Patel',      studentName:'Ava M.',       date:'2025-04-21', status:'triggered', attempts:1, lastError:null, errorClass:null},
+  {id:'tr6', rowNumber:7,  coach:'Aisha Lewis',    studentName:'James P.',     date:'2025-04-20', status:'done',      attempts:1, lastError:null, errorClass:null},
+  {id:'tr7', rowNumber:8,  coach:'Sarah Chen',     studentName:'Sophia L.',    date:'2025-04-14', status:'failed',    attempts:2, lastError:"Google Drive file not accessible \u2014 check sharing settings", errorClass:'drive-permission'},
+  {id:'tr8', rowNumber:9,  coach:'Priya Nair',     studentName:'William B.',   date:'2025-04-15', status:'failed',    attempts:1, lastError:'Could not parse video \u2014 unsupported format', errorClass:'stk-source-invalid'},
+  {id:'tr9', rowNumber:10, coach:'Tom Wright',     studentName:'Charlotte F.', date:'2025-04-22', status:'done',      attempts:2, lastError:null, errorClass:null},
 ];
+
+const trackerStats = {
+  total: 9,
+  byStatus: { triggered:1, done:5, failed:3, archived:0 },
+  byErrorClass: { 'drive-permission':1,'drive-folder-url':0,'drive-not-downloadable':0,'drive-transient':0,'stk-timeout':1,'stk-internal':0,'stk-source-invalid':1,'internal-bug':0,'unclassified':0 },
+  updatedAt: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+  lastFullRebuildAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+};
+let trackerFilter = 'all';
 
 const comparisonsData = [
   {
@@ -2684,34 +2710,144 @@ function navigate(page, coachId, sessionId) {
 /* ─── TRACKER PAGE ───────────────────────────────────────────────── */
 function renderTracker() {
   const el = document.getElementById('tracker-body');
-  const statusColor = s => s==='done'?'var(--pass)':s==='failed'?'var(--fail)':s==='triggered'?'var(--accent)':'var(--text2)';
-  const statusLabel = s => s==='done'?'Done':s==='failed'?'Failed':s==='triggered'?'Triggered':'Queued';
+
+  const STATUS_LABEL = { triggered:'Analysing', done:'Completed', failed:'Errored', archived:'Archived' };
+  const STATUS_STYLE = {
+    triggered: 'background:#e0f2fe;color:#0369a1',
+    done:      'background:#d1fae5;color:#065f46',
+    failed:    'background:#ffe4e6;color:#be123c',
+    archived:  'background:#f4f4f5;color:#52525b',
+  };
+
+  const FBUCKETS = [
+    { key:'drive-share',    title:'Coach needs to re-share the file',        desc:"The Google Drive link isn\u2019t accessible \u2014 wrong sharing, it\u2019s a folder, or downloads are disabled.", ownerLabel:'Coach action',  ownerStyle:'background:#fef3c7;color:#92400e', ec:['drive-permission','drive-folder-url','drive-not-downloadable'] },
+    { key:'transient',      title:'Temporary glitch \u2014 retrying automatically', desc:'Network or upstream hiccup. The job will retry on its own.',                                              ownerLabel:'Auto-retrying', ownerStyle:'background:#e0f2fe;color:#0369a1', ec:['drive-transient','stk-timeout','stk-internal'] },
+    { key:'source-invalid', title:"File can\u2019t be analysed",             desc:"We reached the file but couldn\u2019t analyse it \u2014 likely an unsupported format or corrupt file.",          ownerLabel:'Admin to check',ownerStyle:'background:#ede9fe;color:#6d28d9', ec:['stk-source-invalid'] },
+    { key:'platform',       title:"Something\u2019s wrong on our end",       desc:'Unexpected error. Engineering should investigate.',                                                              ownerLabel:'Engineering',   ownerStyle:'background:#ffe4e6;color:#be123c', ec:['internal-bug','unclassified'] },
+  ];
+
+  const ec2bk = {};
+  FBUCKETS.forEach(b => b.ec.forEach(ec => { ec2bk[ec] = b.key; }));
+  const bkCounts = {'drive-share':0,'transient':0,'source-invalid':0,'platform':0};
+  Object.entries(trackerStats.byErrorClass).forEach(([ec, n]) => { const bk = ec2bk[ec]; if (bk) bkCounts[bk] += n; });
+  const openBuckets = FBUCKETS.filter(b => bkCounts[b.key] > 0);
+
+  function timeAgo(iso) {
+    if (!iso) return 'never';
+    const ms = Date.now() - Date.parse(iso);
+    if (ms < 60000) return Math.floor(ms/1000) + 's ago';
+    if (ms < 3600000) return Math.floor(ms/60000) + 'm ago';
+    if (ms < 86400000) return Math.floor(ms/3600000) + 'h ago';
+    return Math.floor(ms/86400000) + 'd ago';
+  }
+
+  function applyFilter(rows, filter) {
+    if (filter === 'all') return rows;
+    if (filter === 'errored') return rows.filter(r => r.status === 'failed');
+    const bucket = FBUCKETS.find(b => b.key === filter);
+    if (!bucket) return rows;
+    const cls = new Set(bucket.ec);
+    return rows.filter(r => r.status === 'failed' && cls.has(r.errorClass || 'unclassified'));
+  }
+
+  const visibleRows = applyFilter(trackerRows, trackerFilter);
+  const erroredCount = trackerRows.filter(r => r.status === 'failed').length;
+
+  const TILES = [
+    { label:'Total',     value: trackerStats.total,              hint:'' },
+    { label:'Analysing', value: trackerStats.byStatus.triggered, hint:'In flight \u2014 awaiting Social Toolkit analysis' },
+    { label:'Completed', value: trackerStats.byStatus.done,      hint:'Analysis finished successfully' },
+    { label:'Errored',   value: trackerStats.byStatus.failed,    hint:'Failed ingestion or analysis \u2014 see breakdown below' },
+    { label:'Archived',  value: trackerStats.byStatus.archived,  hint:'Removed from the live pipeline' },
+  ];
+
   el.innerHTML = `
     <div class="page-header">
-      <div class="page-title">Google Sheet Tracker</div>
-      <div class="page-sub">Ingestion status for all Google Sheet coaching session rows · refreshes every 15 min</div>
+      <div class="page-title">Sheet Ingestion</div>
+      <div class="page-sub">Automatically imports coaching sessions from Google Sheets every 15 minutes.</div>
     </div>
-    <div class="card" style="padding:0;overflow:hidden">
-      <div class="tracker-header-row">
-        <div>Coach</div>
-        <div>Session Title</div>
-        <div>Date</div>
-        <div>Drive Link</div>
-        <div>Status</div>
-        <div>Ingested At</div>
-        <div>Error</div>
-      </div>
-      ${trackerRows.map(r=>`
-        <div class="tracker-row">
-          <div style="font-weight:600;color:var(--text)">${r.coach}</div>
-          <div style="color:var(--text)">${r.title}</div>
-          <div style="color:var(--text2)">${r.date}</div>
-          <div><a href="#" style="color:var(--accent);font-size:12px" onclick="return false">Drive ↗</a></div>
-          <div><span style="font-size:11px;font-weight:700;color:${statusColor(r.status)};background:${statusColor(r.status)}18;padding:2px 8px;border-radius:10px">${statusLabel(r.status)}</span></div>
-          <div style="color:var(--text2);font-size:12px">${r.ingestedAt||'—'}</div>
-          <div style="color:var(--fail);font-size:12px">${r.error||''}</div>
+
+    <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+      <button onclick="var p=this.nextElementSibling;p.hidden=!p.hidden;this.querySelector('.chev').textContent=p.hidden?'\u25be':'\u25b4'" style="width:100%;display:flex;align-items:center;gap:8px;padding:12px 16px;background:none;border:none;cursor:pointer;font:600 13px var(--font-body);color:var(--text);text-align:left">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.6"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93 17.66 6.34M6.34 17.66 4.93 19.07M19.07 19.07 17.66 17.66M6.34 6.34 4.93 4.93M22 12h-2M4 12H2M12 22v-2M12 4V2"/></svg>
+        Ingest settings
+        <span class="chev" style="margin-left:auto;font-weight:400;color:var(--text2)">\u25be</span>
+      </button>
+      <div hidden style="padding:0 16px 14px;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;font-size:13px">
+          <div><div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Sheet ID</div><div style="font-family:monospace;font-size:11px;color:var(--text)">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</div></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Last run</div><div style="color:var(--text)">${timeAgo(trackerStats.updatedAt)}</div></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Tab name</div><div style="color:var(--text)">Coaching Log</div></div>
+          <div><div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">Cadence</div><div style="color:var(--text)">Every 15 min</div></div>
         </div>
-      `).join('')}
+      </div>
+    </div>
+
+    <div class="tracker-health">
+      <div class="tracker-health-hdr">
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--text)">Sheet row health</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:1px">Updated ${timeAgo(trackerStats.updatedAt)}</div>
+        </div>
+        <button style="font-size:12px;color:var(--text2);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer">Recompute</button>
+      </div>
+      <div class="tracker-tiles">
+        ${TILES.map(t => `<div class="tracker-tile" title="${t.hint}"><div class="tracker-tile-lbl">${t.label}</div><div class="tracker-tile-val">${t.value}</div></div>`).join('')}
+      </div>
+      ${trackerStats.byStatus.failed > 0 && openBuckets.length > 0 ? `
+        <div style="margin-bottom:8px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">What needs attention</div>
+          <div class="tracker-buckets">
+            ${openBuckets.map(b => `
+              <div class="tracker-bucket">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">${b.title}</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--text);flex-shrink:0;font-variant-numeric:tabular-nums">${bkCounts[b.key]}</div>
+                </div>
+                <span class="tracker-bucket-badge" style="${b.ownerStyle}">${b.ownerLabel}</span>
+                <div class="tracker-bucket-desc">${b.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      <div style="border-top:1px solid var(--border);padding-top:10px;font-size:11px;color:var(--text2)">
+        Last recompute: ${timeAgo(trackerStats.lastFullRebuildAt)}
+      </div>
+    </div>
+
+    <div>
+      <div class="tracker-section-hdr">
+        <div style="font-size:15px;font-weight:600;color:var(--text)">Session rows</div>
+        <div style="font-size:12px;color:var(--text2)">${trackerRows.length} total</div>
+      </div>
+      <div class="filter-chips">
+        <span class="filter-chip ${trackerFilter==='all'?'active':''}" onclick="trackerFilter='all';renderTracker()">All</span>
+        <span class="filter-chip ${trackerFilter==='errored'?'active':''}" onclick="trackerFilter='errored';renderTracker()">Errored${erroredCount>0?' ('+erroredCount+')':''}</span>
+        ${FBUCKETS.map(b=>`<span class="filter-chip ${trackerFilter===b.key?'active':''}" onclick="trackerFilter='${b.key}';renderTracker()" title="${b.desc}">${b.title}</span>`).join('')}
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tracker-tbl">
+          <thead>
+            <tr>
+              <th>Row</th><th>Status</th><th style="text-align:center">Attempts</th><th>Coach</th><th>Student</th><th>Date</th><th>Issue</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${visibleRows.length === 0 ? `<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:32px 12px">No rows match this filter.</td></tr>` :
+              visibleRows.map(r=>`
+              <tr>
+                <td style="font-family:monospace;font-size:11px;color:var(--text2)">${r.rowNumber}</td>
+                <td><span style="border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;white-space:nowrap;${STATUS_STYLE[r.status]||''}">${STATUS_LABEL[r.status]||r.status}</span></td>
+                <td style="text-align:center;font-size:12px;color:var(--text2)">${r.attempts}</td>
+                <td style="font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.coach}">${r.coach}</td>
+                <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.studentName||''}">${r.studentName||''}</td>
+                <td style="font-size:12px;color:var(--text2);white-space:nowrap">${r.date}</td>
+                <td style="font-size:12px;color:var(--text2);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.lastError||''}">${r.lastError||''}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
     </div>
   `;
 }
@@ -2950,7 +3086,12 @@ navigate('team');
 <script>
 /* ─── FEEDBACK WIDGET ──────────────────────────────────────────────── */
 (function() {
-  const WEBHOOK = '__GCHAT_WEBHOOK__';
+  const WEBHOOK = (function() {
+    const v = '__GCHAT_WEBHOOK__';
+    // If CI hasn't replaced the placeholder, fall back to localStorage for local dev.
+    // Set it once: localStorage.setItem('gchat_webhook', 'YOUR_WEBHOOK_URL')
+    return v.startsWith('__') ? (localStorage.getItem('gchat_webhook') || v) : v;
+  })();
 
   const btn = document.getElementById('fb-btn');
   const overlay = document.getElementById('fb-overlay');
@@ -3019,7 +3160,7 @@ navigate('team');
       ];
 
       if (screenshotUrl) {
-        widgets.push({ textParagraph: { text: '<a href="' + screenshotUrl + '">View screenshot</a>' } });
+        widgets.push({ image: { imageUrl: screenshotUrl } });
       }
 
       const body = {
@@ -3028,6 +3169,12 @@ navigate('team');
           sections: [{ widgets }]
         }]
       };
+
+      if (!WEBHOOK || WEBHOOK.startsWith('__')) {
+        status.textContent = 'No webhook configured. Run: localStorage.setItem(\'gchat_webhook\', \'YOUR_URL\') then reload.';
+        sendBtn.disabled = false;
+        return;
+      }
 
       await fetch(WEBHOOK, {
         method: 'POST',
