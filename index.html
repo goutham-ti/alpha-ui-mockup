@@ -3157,33 +3157,34 @@ function renderInsightsPanel() {
       <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
         ${behaviorData.map((b,i)=>{
           const coach = coaches.find(c=>c.id===b.id);
-          const rate = coach ? coach.passRate : null;
-          const rateColor = rate>=75?'var(--pass)':rate>=55?'var(--needs)':'var(--fail)';
-          const rateBg   = rate>=75?'var(--pass-bg)':rate>=55?'rgba(245,158,11,.1)':'var(--fail-bg)';
+          const rate  = coach ? coach.passRate : null;
+          const rc    = rate>=75?'var(--pass)':rate>=55?'var(--needs)':'var(--fail)';
+          const rb    = rate>=75?'var(--pass-bg)':rate>=55?'rgba(245,158,11,.1)':'var(--fail-bg)';
+          const s1 = b.strengths[0]||'', s2 = b.strengths[1]||'';
+          const g1 = (b.improvements||[])[0]||'', g2 = (b.improvements||[])[1]||'';
           return `
-          <div style="display:grid;grid-template-columns:200px 1fr;${i>0?'border-top:1px solid var(--border)':''}">
-            <!-- Left: identity + pass rate -->
-            <div style="padding:16px 14px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;justify-content:center">
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="width:28px;height:28px;border-radius:50%;background:${b.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${b.initials}</div>
-                <span style="font-size:13px;font-weight:600;color:var(--text)">${b.name}</span>
+          <div style="display:grid;grid-template-columns:220px 1fr;${i>0?'border-top:1px solid var(--border)':''}">
+            <div style="padding:16px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--surface)">
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:32px;height:32px;border-radius:50%;background:${b.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${b.initials}</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1.2">${b.name}</div>
+                  ${rate!==null?`<div style="font-size:11px;font-weight:700;color:${rc};margin-top:2px">${rate}% pass rate</div>`:''}
+                </div>
               </div>
-              ${rate!==null?`<span style="font-size:11px;font-weight:700;color:${rateColor};background:${rateBg};padding:3px 8px;border-radius:5px;width:fit-content">${rate}% pass rate</span>`:''}
-              <p style="font-size:11px;color:var(--text2);line-height:1.45;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${b.summary}</p>
+              <p style="font-size:11px;color:var(--text2);line-height:1.45;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${b.summary}</p>
             </div>
-            <!-- Right: tags in two columns -->
-            <div style="padding:16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:center">
               <div>
-                <div style="font-size:10px;font-weight:700;color:var(--pass);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Strengths</div>
-                <div style="display:flex;flex-wrap:wrap;gap:4px">
-                  ${b.strengths.slice(0,4).map(s=>`<span style="font-size:11px;color:var(--pass);background:var(--pass-bg);padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap">${s}</span>`).join('')}
-                </div>
+                <div style="font-size:10px;font-weight:700;color:var(--pass);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Strengths</div>
+                ${s1?`<div style="display:flex;gap:7px;margin-bottom:6px"><span style="width:16px;height:16px;border-radius:50%;background:var(--pass-bg);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--pass);flex-shrink:0;margin-top:1px">✓</span><span style="font-size:12px;color:var(--text);line-height:1.4">${s1}</span></div>`:''}
+                ${s2?`<div style="display:flex;gap:7px"><span style="width:16px;height:16px;border-radius:50%;background:var(--pass-bg);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--pass);flex-shrink:0;margin-top:1px">✓</span><span style="font-size:12px;color:var(--text);line-height:1.4">${s2}</span></div>`:''}
               </div>
               <div>
-                <div style="font-size:10px;font-weight:700;color:var(--fail);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">To improve</div>
-                <div style="display:flex;flex-wrap:wrap;gap:4px">
-                  ${(b.improvements||[]).slice(0,4).map(g=>`<span style="font-size:11px;color:var(--fail);background:var(--fail-bg);padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap">${g}</span>`).join('')}
-                </div>
+                <div style="font-size:10px;font-weight:700;color:var(--fail);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">To improve</div>
+                ${g1?`<div style="display:flex;gap:7px;margin-bottom:6px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fail-bg);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--fail);flex-shrink:0;margin-top:1px">↑</span><span style="font-size:12px;color:var(--text);line-height:1.4">${g1}</span></div>`:''}
+                ${g2?`<div style="display:flex;gap:7px"><span style="width:16px;height:16px;border-radius:50%;background:var(--fail-bg);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--fail);flex-shrink:0;margin-top:1px">↑</span><span style="font-size:12px;color:var(--text);line-height:1.4">${g2}</span></div>`:''}
+                ${!g1?`<span style="font-size:11px;color:var(--text2);font-style:italic">None identified</span>`:''}
               </div>
             </div>
           </div>`;
