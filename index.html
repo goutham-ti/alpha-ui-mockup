@@ -1195,7 +1195,7 @@ const coaches = [
     name: 'Priya Nair',
     initials: 'PN',
     color: '#0d9488',
-    role: 'Lead Coach',
+    role: 'Coach',
     passRate: 92,
     totalSessions: 15,
     weekSessions: 4,
@@ -1722,16 +1722,8 @@ function renderCoachProfile(coachId) {
 
   const insightsTabHtml = `
 
-    ${beh ? `
-    <!-- Executive Summary -->
-    <div style="padding:20px 22px;margin-bottom:16px;border-left:3px solid ${spClr};background:rgba(0,0,0,.06);border-radius:0 10px 10px 0">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Executive Summary</div>
-      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px">${beh.summary}</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.65">${beh.pattern}</div>
-    </div>` : ''}
-
     <!-- Charts row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
       <!-- Pass rate trend -->
       <div class="stat-box" style="padding:18px 20px">
         <div class="stat-lbl" style="margin-bottom:10px">Pass Rate — 8-Week Trend</div>
@@ -1769,25 +1761,64 @@ function renderCoachProfile(coachId) {
     </div>
 
     ${beh ? `
-    <!-- Skills & Opportunities -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <!-- Skills -->
-      <div class="stat-box" style="padding:18px 20px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Skills</div>
-        ${beh.strengths.length ? beh.strengths.map(s => `
-          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-            <span style="width:18px;height:18px;border-radius:50%;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:10px;color:var(--pass)">✓</span>
-            <span style="font-size:13px;color:var(--text);line-height:1.4">${s}</span>
-          </div>`).join('') : `<div style="font-size:13px;color:var(--text2)">No strengths data yet.</div>`}
+    <!-- Executive Summary -->
+    <div class="stat-box" style="padding:0;margin-bottom:20px;overflow:hidden">
+      <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:14px;font-weight:600;color:var(--text)">Executive summary</div>
       </div>
-      <!-- Opportunities -->
-      <div class="stat-box" style="padding:18px 20px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Opportunities</div>
-        ${beh.gaps.length ? beh.gaps.map(g => `
-          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-            <span style="width:18px;height:18px;border-radius:50%;background:rgba(245,158,11,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:10px;color:#d97706">↑</span>
-            <span style="font-size:13px;color:var(--text);line-height:1.4">${g}</span>
-          </div>`).join('') : `<div style="font-size:13px;color:var(--text2)">No improvement areas flagged.</div>`}
+      <div style="padding:18px 20px">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:${beh.highlights&&beh.highlights.length ? '16px' : '0'}">${beh.summary}</div>
+        ${beh.highlights && beh.highlights.length ? `
+        <div style="margin-bottom:${beh.risks&&beh.risks.length ? '16px' : beh.recommended_actions&&beh.recommended_actions.length ? '16px' : '0'}">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Highlights</div>
+          <ul style="list-style:disc;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.highlights.map(h=>`<li style="font-size:13px;color:var(--text2);line-height:1.5">${h}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+        ${beh.risks && beh.risks.length ? `
+        <div style="margin-bottom:${beh.recommended_actions&&beh.recommended_actions.length ? '16px' : '0'}">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Risks</div>
+          <ul style="list-style:disc;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.risks.map(r=>`<li style="font-size:13px;color:#b45309;line-height:1.5">${r}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+        ${beh.recommended_actions && beh.recommended_actions.length ? `
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Recommended actions</div>
+          <ol style="list-style:decimal;padding-left:18px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.recommended_actions.map(a=>`<li style="font-size:13px;color:var(--text2);line-height:1.5">${a}</li>`).join('')}
+          </ol>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <!-- Skills & Opportunities -->
+    <div class="stat-box" style="padding:0;margin-bottom:20px;overflow:hidden">
+      <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border)">
+        <div style="font-size:14px;font-weight:600;color:var(--text)">Skills &amp; Opportunities</div>
+      </div>
+      <div style="padding:18px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+        <!-- Strengths -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Strengths</div>
+          ${beh.strengths && beh.strengths.length ? `<ul style="list-style:disc;padding-left:16px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.strengths.map(s=>`<li style="font-size:13px;color:var(--text2);line-height:1.5">${s}</li>`).join('')}
+          </ul>` : `<div style="font-size:13px;color:var(--text3)">None identified yet.</div>`}
+        </div>
+        <!-- Improvements -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Improvements</div>
+          ${beh.improvements && beh.improvements.length ? `<ul style="list-style:disc;padding-left:16px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.improvements.map(i=>`<li style="font-size:13px;color:var(--text2);line-height:1.5">${i}</li>`).join('')}
+          </ul>` : `<div style="font-size:13px;color:var(--text3)">No improvement areas flagged.</div>`}
+        </div>
+        <!-- Coaching Focus -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Coaching focus</div>
+          ${beh.coaching_focus && beh.coaching_focus.length ? `<ul style="list-style:disc;padding-left:16px;margin:0;display:flex;flex-direction:column;gap:5px">
+            ${beh.coaching_focus.map(f=>`<li style="font-size:13px;color:var(--text2);line-height:1.5">${f}</li>`).join('')}
+          </ul>` : `<div style="font-size:13px;color:var(--text3)">No focus areas defined.</div>`}
+        </div>
       </div>
     </div>` : ''}`;
 
@@ -2166,45 +2197,196 @@ const overallTrend = [64, 66, 68, 70, 71, 72, 73, 73]; // team avg
 const behaviorData = [
   {
     id:'priya', name:'Priya Nair', initials:'PN', color:'#0d9488',
-    summary: '<strong>Strong in</strong> Socratic method · <strong>Consistent</strong> progress checks',
-    strengths: ['Progress checks','Socratic method','Session wrap-ups'],
-    gaps: [],
-    pattern: 'Consistently uses guiding questions. Students regularly arrive at answers independently. Always opens with a documented progress check referencing prior session notes.'
+    summary: 'Priya is one of the most consistently effective coaches on the team. Across all 15 sessions analyzed this period, she maintained a rigorous Socratic approach — posing targeted questions that lead students to self-discovery rather than delivering answers directly. Her progress checks are exemplary: she references prior session notes by name, confirms current mastery levels, and documents next steps in every session. Students coached by Priya show measurably higher independent problem-solving rates in follow-up sessions. Her 92% pass rate is the highest on the team and has been stable for the last six weeks.',
+    highlights: [
+      'Consistent 92% pass rate — highest on the team, stable for 6 weeks',
+      'Every session opens with a documented progress check referencing prior notes',
+      'Students regularly solve problems independently by session end',
+      'Session wrap-ups include clear, specific next steps in 14 of 15 sessions',
+      'Socratic questioning technique rated 5/5 in 12 of 15 sessions',
+    ],
+    risks: [],
+    recommended_actions: [
+      'Invite Priya to lead a peer session-sharing workshop on Socratic method',
+      'Use Priya\'s sessions as benchmark recordings for onboarding new coaches',
+    ],
+    strengths: [
+      'Structured progress checks every session',
+      'Consistent Socratic questioning technique',
+      'Clear session wrap-ups with documented next steps',
+      'Strong student engagement and confidence-building',
+      'High session documentation quality',
+    ],
+    improvements: [],
+    coaching_focus: [
+      'Continue current approach — sustain quality as session volume increases',
+      'Mentor coaches with lower Socratic method scores',
+    ],
   },
   {
     id:'sarah', name:'Sarah Chen', initials:'SC', color:'#1d4ed8',
-    summary: '<strong>Strong in</strong> Coach effectiveness · <strong>Watch:</strong> occasional direct answers',
-    strengths: ['Coach effectiveness','Student engagement'],
-    gaps: ['Occasionally gives direct answers'],
-    pattern: 'Generally strong Socratic questioning. Slips into direct answers when students are visibly frustrated. Progress checks present but sometimes brief.'
+    summary: 'Sarah is a strong, reliable coach who demonstrates clear mastery of the Socratic method in the majority of her sessions. Her student engagement scores are consistently high, and students report feeling heard and supported. The primary pattern flagged across her sessions is a tendency to slip into direct answer-giving when students show visible frustration — particularly in the 15–25 minute mark of longer sessions. This occurs in roughly 3 of every 5 sessions and represents the key gap between her current performance and top-tier coaching. Progress checks are present but sometimes brief, and occasionally do not reference prior session documentation.',
+    highlights: [
+      '78% pass rate — above team average',
+      'Student engagement and interaction dynamics rated 4–5/5 across all sessions',
+      'Strong rapport: students frequently self-initiate answers in latter half of sessions',
+      'Progress checks present in all sessions, though depth varies',
+    ],
+    risks: [
+      'Slips into direct answers during student frustration moments (observed in ~60% of sessions)',
+      'Some progress checks lack reference to prior session notes',
+    ],
+    recommended_actions: [
+      'Review 2–3 sessions where direct-answer slippage occurred and identify triggers',
+      'Practice "bridge questions" for frustration moments — keep guiding without answering',
+      'Standardize progress check opening with a brief prior-session recap prompt',
+    ],
+    strengths: [
+      'Coach effectiveness — Socratic method in calm moments',
+      'Student engagement and relationship quality',
+      'Consistent session attendance and documentation',
+    ],
+    improvements: [
+      'Maintaining Socratic approach under student frustration',
+      'Depth and consistency of progress checks',
+    ],
+    coaching_focus: [
+      'Develop a "frustration protocol" — guiding questions for stuck students',
+      'Review recordings where direct answers occurred to build self-awareness',
+    ],
   },
   {
     id:'aisha', name:'Aisha Lewis', initials:'AL', color:'#4338ca',
-    summary: '<strong>Strong in</strong> Interaction dynamics · <strong>Steady</strong> improvement trend',
-    strengths: ['Interaction dynamics','Student confidence-building'],
-    gaps: [],
-    pattern: 'Creates a safe, warm environment that encourages students to take risks. Students often lead the latter half of sessions independently.'
+    summary: 'Aisha has shown the strongest improvement trajectory on the team over the past 8 weeks, climbing from a 62% to a 74% pass rate. Her greatest strength is the learning environment she creates — students consistently describe sessions as safe, encouraging, and productive. She excels at building confidence progressively through a session, often enabling students to lead the last 15–20 minutes independently. Her current development area is the opening structure of sessions: progress checks are present but often lack the specific reference to prior-session objectives that the top-rated coaches demonstrate. As she internalizes this habit, she has the profile of a consistently high-performing coach.',
+    highlights: [
+      'Pass rate improved from 62% to 74% over 8 weeks — strongest growth on team',
+      'Interaction dynamics rated 5/5 in 11 of 13 sessions',
+      'Students frequently self-direct in the latter half of sessions',
+      'Zero instances of direct answer-giving logged across all sessions',
+    ],
+    risks: [
+      'Progress check depth still inconsistent — occasionally lacks reference to prior objectives',
+    ],
+    recommended_actions: [
+      'Add a structured 2-minute session opener checklist that includes prior-session reference',
+      'Pair with Priya for one co-observed session to see exemplary progress check execution',
+    ],
+    strengths: [
+      'Interaction dynamics and emotional safety',
+      'Progressive student confidence-building',
+      'Consistent Socratic approach — no direct answer instances',
+      'Strong improvement trend across all three pass criteria',
+    ],
+    improvements: [
+      'Consistency and depth of session-opening progress checks',
+      'Documentation of prior-session objectives during opener',
+    ],
+    coaching_focus: [
+      'Formalize session-opening structure with prior-session reference habit',
+      'Maintain current Socratic approach and interaction quality as pass rate climbs',
+    ],
   },
   {
     id:'marcus', name:'Marcus Johnson', initials:'MJ', color:'#7c3aed',
-    summary: '<strong>Improving</strong> · <strong>Gap:</strong> Socratic method consistency',
-    strengths: ['Rapport building'],
-    gaps: ['Skips progress checks','Gives answers directly'],
-    pattern: 'Tends to explain concepts rather than guide discovery. Progress checks are inconsistent. Good rapport with students but coaching approach needs to shift toward questioning.'
+    summary: 'Marcus is a personable coach who builds genuine rapport with students, but his coaching approach is currently inconsistent with the program\'s Socratic method standard. The primary issue observed across his sessions is a pattern of explanation-first delivery: when students are stuck, Marcus tends to explain the concept directly rather than using guiding questions to lead them to the answer. Progress checks are missing or minimal in 7 of his last 10 sessions. Despite strong personal rapport, these gaps result in a 48% pass rate — the second lowest on the team. Marcus has expressed awareness of these gaps and has responded positively to feedback in one-on-ones.',
+    highlights: [
+      'Strong student rapport — highest relationship quality ratings on the team',
+      'Students consistently engaged and willing to participate',
+    ],
+    risks: [
+      'Direct answer-giving observed in 8 of 10 sessions — most frequent on team',
+      'Progress checks missing or insufficient in 7 of 10 sessions',
+      '48% pass rate — significantly below team average',
+      'Explanation-first delivery style undermines student independent problem-solving',
+    ],
+    recommended_actions: [
+      'Implement a mandatory "3 questions before explanation" protocol in every session',
+      'Require a written progress check log submitted before each session starts',
+      'Weekly recording review with a senior coach for targeted feedback',
+      'Set a 30-day checkpoint: target 60% pass rate with structured support',
+    ],
+    strengths: [
+      'Student rapport and relationship building',
+      'Student engagement and willingness to participate',
+      'Responsiveness to feedback in coaching conversations',
+    ],
+    improvements: [
+      'Adopting Socratic method — replacing explanation with guiding questions',
+      'Completing structured progress checks each session',
+      'Documenting session objectives and student progress',
+    ],
+    coaching_focus: [
+      'Daily practice of guiding questions using low-stakes topics',
+      'Study 2 exemplary recordings per week with annotated question maps',
+      'Build progress check habit with a simple written template',
+    ],
   },
   {
     id:'raj', name:'Raj Patel', initials:'RP', color:'#0891b2',
-    summary: '<strong>Mixed</strong> · <strong>Strong</strong> second-half questioning, weak opener',
-    strengths: ['Second-half questioning','Session documentation'],
-    gaps: ['Weak session openers','Over-explains early on'],
-    pattern: 'First 20 minutes tend toward direct instruction; second half shows strong Socratic technique. Progress checks present. Consistent documentation of next steps.'
+    summary: 'Raj shows a distinctive split pattern in his coaching: the first 20 minutes of his sessions tend toward direct instruction and over-explanation, while the second half consistently demonstrates strong Socratic questioning and effective guided discovery. This suggests Raj has internalized the Socratic method but struggles to apply it during the session warm-up when students are still calibrating. Progress checks are present and well-documented, and his session notes are among the most thorough on the team. Addressing the opener pattern would likely push his pass rate from 71% to the 80–85% range.',
+    highlights: [
+      '71% pass rate — above team average',
+      'Session documentation quality consistently rated among the top two on the team',
+      'Strong Socratic questioning observed in 85% of second-half session segments',
+      'Progress checks present and well-referenced in all sessions',
+    ],
+    risks: [
+      'Over-explanation pattern in first 20 minutes observed in 7 of 9 sessions',
+      'Session openers lack consistent guiding questions — direct instruction dominant',
+    ],
+    recommended_actions: [
+      'Begin each session with 3 explicit Socratic questions before any explanation',
+      'Review 2 recordings focusing only on the first 20 minutes — identify trigger patterns',
+      'Consider a session template that front-loads student recall questions in the opener',
+    ],
+    strengths: [
+      'Second-half Socratic questioning technique',
+      'Session documentation and next-step planning',
+      'Consistent progress check quality',
+      'Student response quality in guided-discovery segments',
+    ],
+    improvements: [
+      'Session opener approach — shift from instruction to Socratic questioning from minute one',
+      'Reducing over-explanation early in sessions',
+    ],
+    coaching_focus: [
+      'Practice "cold open" questioning — no preamble, straight to guiding student recall',
+      'Time-box the explanation phase to 3 minutes max and document adherence',
+    ],
   },
   {
     id:'tom', name:'Tom Wright', initials:'TW', color:'#9a3412',
-    summary: '<strong>Needs support</strong> · Misses progress checks · Gives direct answers',
-    strengths: [],
-    gaps: ['No progress checks','Gives direct answers','No session wrap-ups'],
-    pattern: 'Rarely completes a structured progress check. Frequently gives answers directly when students are stuck rather than using guiding questions. Sessions often end without documented next steps.'
+    summary: 'Tom\'s sessions reflect a coaching approach that is currently misaligned with the program\'s core standard. Structured progress checks are absent in all 8 sessions reviewed, sessions frequently end without documented next steps, and direct answer-giving was observed in every session analyzed. Students remain engaged at a surface level — Tom has good energy and a warm tone — but the absence of Socratic questioning means students are not building independent problem-solving capacity. His 34% pass rate reflects this systemic gap. Tom requires structured, intensive support with clear milestones and regular observation to develop the foundational habits the program requires.',
+    highlights: [],
+    risks: [
+      'Progress checks absent in all 8 sessions reviewed this period',
+      'Direct answer-giving observed in every session — no exceptions',
+      'No session wrap-ups with documented next steps in any reviewed session',
+      '34% pass rate — lowest on the team',
+      'Students not building independent problem-solving capacity under current approach',
+    ],
+    recommended_actions: [
+      'Immediate: provide a mandatory session structure template with progress check, question prompts, and wrap-up fields',
+      'Weekly one-on-one coaching sessions with admin for the next 4 weeks',
+      'Pair with Priya for 2 shadow observations before next independent sessions',
+      'Set a 6-week improvement plan with pass rate checkpoints at 45%, 55%, 65%',
+      'Review all future sessions for the next 30 days with structured feedback form',
+    ],
+    strengths: [
+      'Warm tone and positive energy with students',
+      'Student surface-level engagement — students like Tom',
+    ],
+    improvements: [
+      'Implementing structured progress checks every session',
+      'Replacing direct answer-giving with guiding questions',
+      'Completing session wrap-ups with documented next steps',
+      'Adopting Socratic method as default interaction style',
+    ],
+    coaching_focus: [
+      'Master the three mandatory pass criteria before focusing on any other dimension',
+      'Use a printed session checklist until habits are internalized',
+      'Record every session and review with a senior coach before the next session',
+    ],
   },
 ];
 
