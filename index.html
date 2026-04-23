@@ -3033,8 +3033,6 @@ function renderNav() {
     avatarBadge.textContent = 'Admin';
     avatarBadge.style.display = '';
     links.innerHTML = `
-      <button class="nav-link ${state.page==='upload' ? 'active' : ''}"
-        onclick="navigate('upload')">Sessions</button>
       <button class="nav-link ${state.page==='insights' ? 'active' : ''}"
         onclick="navigate('insights')">Insights</button>
       <div class="nav-section-label">Admin</div>
@@ -3043,7 +3041,9 @@ function renderNav() {
       <button class="nav-link ${state.page==='comparisons' ? 'active' : ''}"
         onclick="navigate('comparisons')">Compare</button>
       <button class="nav-link ${state.page==='tracker' ? 'active' : ''}"
-        onclick="navigate('tracker')">Tracker</button>`;
+        onclick="navigate('tracker')">Tracker</button>
+      <button class="nav-link ${state.page==='upload' ? 'active' : ''}"
+        onclick="navigate('upload')">Sessions</button>`;
   } else {
     avatarIcon.textContent = 'SC';
     avatarName.textContent = 'Sarah Chen';
