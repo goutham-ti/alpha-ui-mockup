@@ -1125,7 +1125,7 @@
         <div class="kpi">
           <div class="kpi-lbl">Coaches Above Target</div>
           <div class="kpi-val">4 <span style="font-size:20px;color:var(--text2);font-weight:400">/ 6</span></div>
-          <div class="kpi-hint">Target: 75% pass rate</div>
+          <div class="kpi-hint">Target: 85% pass rate</div>
         </div>
         <div class="kpi">
           <div class="kpi-lbl">Avg Session Duration</div>
@@ -1689,14 +1689,14 @@ function gradeClass(grade) {
 }
 
 function healthClass(rate) {
-  if (rate >= 75) return 'pass';
-  if (rate >= 55) return 'needs';
+  if (rate >= 85) return 'pass';
+  if (rate >= 60) return 'needs';
   return 'fail';
 }
 
 function passRateClass(rate) {
-  if (rate >= 75) return 'cc-pass';
-  if (rate >= 55) return 'cc-needs';
+  if (rate >= 85) return 'cc-pass';
+  if (rate >= 60) return 'cc-needs';
   return 'cc-fail';
 }
 
@@ -3282,8 +3282,8 @@ function renderInsightsPanel() {
         ${behaviorData.map((b,i)=>{
           const coach = coaches.find(c=>c.id===b.id);
           const rate  = coach ? coach.passRate : null;
-          const rc    = rate>=75?'var(--pass)':rate>=55?'var(--needs)':'var(--fail)';
-          const rb    = rate>=75?'var(--pass-bg)':rate>=55?'rgba(245,158,11,.1)':'var(--fail-bg)';
+          const rc    = rate>=85?'var(--pass)':rate>=60?'var(--needs)':'var(--fail)';
+          const rb    = rate>=85?'var(--pass-bg)':rate>=60?'rgba(245,158,11,.1)':'var(--fail-bg)';
           const s1 = b.strengths[0]||'', s2 = b.strengths[1]||'';
           const g1 = (b.improvements||[])[0]||'', g2 = (b.improvements||[])[1]||'';
           return `
@@ -3426,8 +3426,8 @@ function renderInsightsPanel() {
       if (!data) return `<td style="text-align:center;color:var(--text2);font-size:12px">—</td>`;
       const total = data.pass + data.fail;
       const rate = Math.round((data.pass / total) * 100);
-      const col = rate >= 75 ? 'var(--pass)' : rate >= 55 ? 'var(--needs)' : 'var(--fail)';
-      const bg  = rate >= 75 ? 'var(--pass-bg)' : rate >= 55 ? 'rgba(245,158,11,.1)' : 'var(--fail-bg)';
+      const col = rate >= 85 ? 'var(--pass)' : rate >= 60 ? 'var(--needs)' : 'var(--fail)';
+      const bg  = rate >= 85 ? 'var(--pass-bg)' : rate >= 60 ? 'rgba(245,158,11,.1)' : 'var(--fail-bg)';
       return `
         <td style="text-align:center;padding:10px 8px">
           <div style="display:inline-flex;flex-direction:column;align-items:center;gap:3px">
@@ -3466,9 +3466,9 @@ function renderInsightsPanel() {
         </table>
       </div>
       <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--pass-bg);color:var(--pass);padding:1px 8px;border-radius:10px;font-weight:600">75%+</span> Pass</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:rgba(245,158,11,.1);color:var(--needs);padding:1px 8px;border-radius:10px;font-weight:600">55–74%</span> Needs improvement</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--fail-bg);color:var(--fail);padding:1px 8px;border-radius:10px;font-weight:600">&lt;55%</span> At risk</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--pass-bg);color:var(--pass);padding:1px 8px;border-radius:10px;font-weight:600">85%+</span> Pass</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:rgba(245,158,11,.1);color:var(--needs);padding:1px 8px;border-radius:10px;font-weight:600">60–84%</span> Needs improvement</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--fail-bg);color:var(--fail);padding:1px 8px;border-radius:10px;font-weight:600">&lt;60%</span> At risk</div>
         <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="color:var(--text2)">—</span> No sessions in range</div>
       </div>
     `;
