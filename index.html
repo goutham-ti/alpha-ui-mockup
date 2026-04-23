@@ -3163,8 +3163,8 @@ function renderInsightsPanel() {
           const s1 = b.strengths[0]||'', s2 = b.strengths[1]||'';
           const g1 = (b.improvements||[])[0]||'', g2 = (b.improvements||[])[1]||'';
           return `
-          <div style="display:grid;grid-template-columns:220px 1fr;${i>0?'border-top:1px solid var(--border)':''}">
-            <div style="padding:16px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:6px;background:var(--surface)">
+          <div style="display:grid;grid-template-columns:220px 1fr;${i>0?'border-top:1px solid var(--border)':''}cursor:pointer;transition:background .12s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="navigate('coach','${b.id}')">
+            <div style="padding:16px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:6px;background:transparent">
               <div style="display:flex;align-items:center;gap:9px">
                 <div style="width:32px;height:32px;border-radius:50%;background:${b.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${b.initials}</div>
                 <div>
