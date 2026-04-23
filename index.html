@@ -2096,18 +2096,16 @@ function yAxisLines(h, chartH) {
 
 let activeCoachFilters = new Set(coaches.map(c=>c.id));
 let insightsSubTab = 'overview';
-let insightsTimeRange = '8w';
+let insightsDateFrom = '2026-02-25';
+let insightsDateTo   = '2026-04-23';
 
-const TIME_RANGES = [
-  { key:'4w',  label:'4W',  hint:'Last 4 weeks' },
-  { key:'8w',  label:'8W',  hint:'Last 8 weeks' },
-  { key:'3m',  label:'3M',  hint:'Last 3 months' },
-  { key:'all', label:'All', hint:'All time' },
-];
-
-function setInsightsTimeRange(key) {
-  insightsTimeRange = key;
-  renderInsights();
+function setInsightsDate(field, val) {
+  if (field === 'from') insightsDateFrom = val;
+  else insightsDateTo = val;
+  // Update label if visible, then re-render panel only (keeps filter bar intact)
+  const lbl = document.getElementById('ins-date-label');
+  if (lbl) lbl.textContent = fmtDateRange(insightsDateFrom, insightsDateTo);
+  renderInsightsPanel();
 }
 function toggleInsightsCoach(id) {
   if (activeCoachFilters.has(id)) {
@@ -2115,29 +2113,57 @@ function toggleInsightsCoach(id) {
   } else {
     activeCoachFilters.add(id);
   }
+  // Update dropdown label + tick marks without closing the dropdown
+  const lbl = document.getElementById('ins-coach-label');
+  if (lbl) lbl.textContent = activeCoachFilters.size === coaches.length ? 'All coaches' : activeCoachFilters.size + ' selected';
+  document.querySelectorAll('.ins-coach-cb').forEach(cb => {
+    cb.checked = activeCoachFilters.has(cb.dataset.id);
+  });
+  renderInsightsPanel();
+}
+function insightsSelectAllCoaches() {
+  coaches.forEach(c => activeCoachFilters.add(c.id));
   renderInsights();
+}
+function insightsClearCoaches() {
+  activeCoachFilters = new Set([coaches[0].id]);
+  renderInsights();
+}
+function fmtDateRange(from, to) {
+  const fmt = s => { const d = new Date(s+'T00:00:00'); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+  return fmt(from) + ' – ' + fmt(to);
 }
 
 function renderInsights() {
   const el = document.getElementById('insights-body');
   const isCoach = state.role === 'coach';
+  const selectedCount = activeCoachFilters.size;
+  const coachLabel = selectedCount === coaches.length ? 'All coaches' : selectedCount + ' selected';
 
-  const timeRangeBar = `
-    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-right:2px">Range</span>
-      ${TIME_RANGES.map(r=>`
-        <button title="${r.hint}" onclick="setInsightsTimeRange('${r.key}')" style="font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px;cursor:pointer;border:1px solid ${insightsTimeRange===r.key?'var(--text)':'var(--border)'};background:${insightsTimeRange===r.key?'var(--text)':'var(--surface)'};color:${insightsTimeRange===r.key?'var(--bg)':'var(--text2)'};transition:all .12s">${r.label}</button>
-      `).join('')}
-    </div>`;
-
-  const coachFilterBar = !isCoach ? `
-    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-      <span style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-right:2px">Coaches</span>
-      ${coaches.map(c=>`
-        <button onclick="toggleInsightsCoach('${c.id}')" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid ${activeCoachFilters.has(c.id)?c.color:'var(--border)'};background:${activeCoachFilters.has(c.id)?c.color+'18':'var(--surface)'};color:${activeCoachFilters.has(c.id)?c.color:'var(--text2)'};transition:all .12s">
-          <span style="width:6px;height:6px;border-radius:50%;background:${c.color};flex-shrink:0"></span>${c.name.split(' ')[0]}
-        </button>
-      `).join('')}
+  const coachDropdown = !isCoach ? `
+    <div style="position:relative;display:inline-block">
+      <details id="ins-coach-dropdown" style="position:relative">
+        <summary style="list-style:none;-webkit-appearance:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:13px;color:var(--text);white-space:nowrap;user-select:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.5"><circle cx="12" cy="12" r="4"/><path d="M16 8v-2a4 4 0 0 0-8 0v2"/><rect x="2" y="8" width="20" height="14" rx="2"/></svg>
+          Coaches: <span id="ins-coach-label">${coachLabel}</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4;margin-left:2px"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div onclick="event.stopPropagation()" style="position:absolute;top:calc(100% + 4px);left:0;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:8px;min-width:200px">
+          <div style="display:flex;gap:6px;padding:4px 6px 8px;border-bottom:1px solid var(--border);margin-bottom:6px">
+            <button onclick="insightsSelectAllCoaches()" style="font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">All</button>
+            <button onclick="insightsClearCoaches()" style="font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer">None</button>
+          </div>
+          ${coaches.map(c=>`
+            <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)">
+              <input type="checkbox" class="ins-coach-cb" data-id="${c.id}" ${activeCoachFilters.has(c.id)?'checked':''}
+                onchange="toggleInsightsCoach('${c.id}')"
+                style="width:14px;height:14px;accent-color:${c.color};cursor:pointer" />
+              <span style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0"></span>
+              ${c.name}
+            </label>
+          `).join('')}
+        </div>
+      </details>
     </div>` : '';
 
   el.innerHTML = `
@@ -2145,9 +2171,14 @@ function renderInsights() {
       <div class="page-title">Insights</div>
       <div class="page-sub">${isCoach ? 'Your AI-powered performance analysis' : 'AI-powered analysis across all coaching sessions'}</div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px">
-      ${timeRangeBar}
-      ${coachFilterBar}
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.4;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <input type="date" value="${insightsDateFrom}" onchange="setInsightsDate('from',this.value)"
+        style="font-size:13px;padding:5px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);cursor:pointer" />
+      <span style="font-size:13px;color:var(--text2)">to</span>
+      <input type="date" value="${insightsDateTo}" onchange="setInsightsDate('to',this.value)"
+        style="font-size:13px;padding:5px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);cursor:pointer" />
+      ${coachDropdown}
     </div>
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
