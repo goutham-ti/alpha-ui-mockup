@@ -2548,7 +2548,6 @@ function renderInsights() {
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
       ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>` : ''}
-      ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='lastcall'?'active':''}" onclick="switchInsightsTab('lastcall')">Last Call</button>` : ''}
       <button class="ins-tab ${insightsSubTab==='students'?'active':''}" onclick="switchInsightsTab('students')">Students</button>
     </div>
     <div id="ins-panel"></div>
@@ -2661,11 +2660,19 @@ function renderInsightsPanel() {
       return;
     }
 
-    // Admin view: full team stats
-    const totalPass = coaches.reduce((s,c)=>s+Math.round(c.totalSessions*(c.passRate/100)),0);
-    const totalFail = coaches.reduce((s,c)=>s+(c.totalSessions-Math.round(c.totalSessions*(c.passRate/100))),0);
+    // Admin view: full team stats — derived from date-filtered sessions
+    const coachesFiltered = coaches.map(c => {
+      const fs = filterSessionsByDate(c.sessions);
+      const fp = fs.filter(x => x.grade === 'PASS').length;
+      const ft = fs.length;
+      const fr = ft ? Math.round((fp / ft) * 100) : 0;
+      return {...c, filteredSessions: fs, filteredPass: fp, filteredFail: ft - fp, filteredTotal: ft, filteredRate: fr};
+    });
+    const totalPass = coachesFiltered.reduce((s,c)=>s+c.filteredPass,0);
+    const totalFail = coachesFiltered.reduce((s,c)=>s+c.filteredFail,0);
     const totalSessions = totalPass + totalFail;
-    const sortedByPass = [...coaches].sort((a,b)=>b.passRate-a.passRate);
+    const overallPassRate = totalSessions ? Math.round(totalPass/totalSessions*100) : 0;
+    const sortedByPass = [...coachesFiltered].sort((a,b)=>b.filteredRate-a.filteredRate);
 
     el.innerHTML = `
       <div class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
@@ -2676,17 +2683,17 @@ function renderInsightsPanel() {
         </div>
         <div class="kpi">
           <div class="kpi-lbl">Overall Pass Rate</div>
-          <div class="kpi-val pass-color">73%</div>
-          <div class="kpi-hint">+9 pts vs 8 weeks ago</div>
+          <div class="kpi-val pass-color">${overallPassRate}%</div>
+          <div class="kpi-hint">${fmtDateRange(insightsDateFrom, insightsDateTo)}</div>
         </div>
         <div class="kpi">
           <div class="kpi-lbl">Coaches Tracked</div>
-          <div class="kpi-val">${coaches.length}</div>
-          <div class="kpi-hint">Across all sessions</div>
+          <div class="kpi-val">${coachesFiltered.filter(c=>c.filteredTotal>0).length}</div>
+          <div class="kpi-hint">With sessions in range</div>
         </div>
         <div class="kpi">
           <div class="kpi-lbl">Avg Pass Rate</div>
-          <div class="kpi-val">73%</div>
+          <div class="kpi-val">${overallPassRate}%</div>
           <div class="kpi-hint">Team average</div>
         </div>
       </div>
@@ -2787,6 +2794,57 @@ function renderInsightsPanel() {
         </div>
         <div style="height:190px"><canvas id="adm-trend-chart"></canvas></div>
       </div>
+
+      <!-- Most Recent Session per Coach (inline table) -->
+      <div class="chart-box" style="margin-bottom:0">
+        <div class="chart-title" style="margin-bottom:2px">Most Recent Session per Coach</div>
+        <div class="chart-sub" style="margin-bottom:12px">Last recorded session within the selected date range</div>
+        ${(()=>{
+          const rows = coaches.map(c => {
+            const fs = filterSessionsByDate(c.sessions);
+            const last = fs[0] || null;
+            return {coach: c, session: last};
+          });
+          if (rows.every(r => !r.session)) return `<p style="font-size:13px;color:var(--text2)">No sessions in this date range.</p>`;
+          return `<table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Coach</th>
+                <th style="text-align:left;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Session</th>
+                <th style="text-align:left;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Student</th>
+                <th style="text-align:left;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Date</th>
+                <th style="text-align:left;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Dur</th>
+                <th style="text-align:center;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(({coach: c, session: s}) => s ? `
+              <tr style="border-bottom:1px solid var(--surface2);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="navigate('recording','${c.id}','${s.id}')">
+                <td style="padding:8px 10px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:26px;height:26px;border-radius:50%;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
+                    <span style="font-weight:500;color:var(--text)">${c.name}</span>
+                  </div>
+                </td>
+                <td style="padding:8px 10px;color:var(--text)">${s.title}</td>
+                <td style="padding:8px 10px;color:var(--text2)">${s.student}</td>
+                <td style="padding:8px 10px;color:var(--text2)">${s.date}</td>
+                <td style="padding:8px 10px;color:var(--text2)">${s.dur}</td>
+                <td style="padding:8px 10px;text-align:center">${gradePill(s.grade)}</td>
+              </tr>` : `
+              <tr style="border-bottom:1px solid var(--surface2)">
+                <td style="padding:8px 10px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:26px;height:26px;border-radius:50%;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
+                    <span style="font-weight:500;color:var(--text)">${c.name}</span>
+                  </div>
+                </td>
+                <td colspan="5" style="padding:8px 10px;color:var(--text2);font-style:italic">No sessions in range</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`;
+        })()}
+      </div>
     `;
 
     // ── Doughnut ──────────────────────────────────────────────────
@@ -2819,7 +2877,7 @@ function renderInsightsPanel() {
         datasets: [
           {
             label: 'Pass',
-            data: sortedByPass.map(c => c.passRate),
+            data: sortedByPass.map(c => c.filteredRate),
             backgroundColor: '#10b981',
             stack: 'stack',
             borderSkipped: false,
@@ -2827,7 +2885,7 @@ function renderInsightsPanel() {
           },
           {
             label: 'Fail',
-            data: sortedByPass.map(c => 100 - c.passRate),
+            data: sortedByPass.map(c => 100 - c.filteredRate),
             backgroundColor: '#ef4444',
             stack: 'stack',
             borderSkipped: false,
@@ -2861,14 +2919,14 @@ function renderInsightsPanel() {
       const DIM_COLOR  = 'rgba(200,210,220,0.25)';
       const DIM_BORDER = 'rgba(180,190,200,0.3)';
 
-      const datasets = coaches.map(c => ({
+      const datasets = coachesFiltered.map(c => ({
         label: c.name,
-        _basePct: c.passRate,
-        _baseColor: coachLineColor(c.passRate, 1),
+        _basePct: c.filteredRate,
+        _baseColor: coachLineColor(c.filteredRate, 1),
         data: c.trend,
-        borderColor: coachLineColor(c.passRate, 0.4),
+        borderColor: coachLineColor(c.filteredRate, 0.4),
         backgroundColor: 'transparent',
-        pointBackgroundColor: coachLineColor(c.passRate, 0.4),
+        pointBackgroundColor: coachLineColor(c.filteredRate, 0.4),
         pointBorderColor: 'transparent',
         borderWidth: 1.5,
         pointRadius: 4,
@@ -2901,13 +2959,13 @@ function renderInsightsPanel() {
 
       // Custom legend with hover interaction
       const legendEl = document.getElementById('ov-trend-legend');
-      legendEl.innerHTML = coaches.map(c => {
-        const col = coachLineColor(c.passRate, 1);
+      legendEl.innerHTML = coachesFiltered.map(c => {
+        const col = coachLineColor(c.filteredRate, 1);
         return '<div class="ov-legend-item" data-coach="' + c.name + '"' +
           ' style="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:default;transition:background 0.15s">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + col + ';flex-shrink:0;display:inline-block"></span>' +
           '<span style="font-size:12px;color:#3f3f46;white-space:nowrap">' + c.name.split(' ')[0] + '</span>' +
-          '<span style="font-size:12px;color:' + col + ';font-weight:700;margin-left:auto;padding-left:8px">' + c.passRate + '%</span>' +
+          '<span style="font-size:12px;color:' + col + ';font-weight:700;margin-left:auto;padding-left:8px">' + (c.filteredTotal ? c.filteredRate + '%' : '—') + '</span>' +
           '</div>';
       }).join('');
 
@@ -2945,12 +3003,12 @@ function renderInsightsPanel() {
 
     // ── Admin: Sessions per coach ─────────────────────────────────
     (function() {
-      const joined = coaches.map(c => Math.round(c.totalSessions * 0.84));
-      const noShow = coaches.map(c => c.totalSessions - Math.round(c.totalSessions * 0.84));
+      const joined = coachesFiltered.map(c => Math.round(c.filteredTotal * 0.84));
+      const noShow = coachesFiltered.map(c => c.filteredTotal - Math.round(c.filteredTotal * 0.84));
       new Chart(document.getElementById('adm-sess-bar'), {
         type: 'bar',
         data: {
-          labels: coaches.map(c => c.name.split(' ')[0]),
+          labels: coachesFiltered.map(c => c.name.split(' ')[0]),
           datasets: [
             { label: 'Joined',  data: joined,  backgroundColor: '#10b981', stack: 's', borderRadius: { topRight:3, bottomRight:3 }, borderSkipped: false },
             { label: 'No-show', data: noShow,  backgroundColor: '#ef4444', stack: 's', borderRadius: 0, borderSkipped: false }
@@ -3207,10 +3265,13 @@ function renderInsightsPanel() {
   }
 
   else if (insightsSubTab === 'students') {
-    // Filter students to only show current coach's students in coach view
+    // Filter students to those appearing in date-filtered sessions
+    const filteredStudentNames = new Set(
+      coaches.flatMap(c => filterSessionsByDate(c.sessions).map(s => s.student))
+    );
     const visibleStudents = isCoach
-      ? studentData.filter(s => s.coach === me.name)
-      : studentData;
+      ? studentData.filter(s => s.coach === me.name && filteredStudentNames.has(s.name))
+      : studentData.filter(s => filteredStudentNames.has(s.name));
 
     el.innerHTML = `
       <div style="margin-bottom:20px">
