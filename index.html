@@ -1134,7 +1134,13 @@
         </div>
       </div>
 
-      <div class="section-head">Your Coaches</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-head" style="margin-bottom:0">Your Coaches</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)">
+          <span>Sort by</span>
+          <div id="team-sort-btns" style="display:flex;gap:4px"></div>
+        </div>
+      </div>
       <div class="coaches-grid" id="coaches-grid"></div>
     </div>
   </div>
@@ -1593,8 +1599,27 @@ function gradePill(grade) {
 
 /* ─── RENDER: TEAM BOARD ────────────────────────────────────────── */
 function renderTeamBoard() {
+  const sortOptions = [
+    { key: 'passRate',      label: 'Pass Rate' },
+    { key: 'totalSessions', label: 'Sessions'  },
+    { key: 'name',          label: 'Name'      },
+  ];
+  const sortBtns = document.getElementById('team-sort-btns');
+  if (sortBtns) {
+    sortBtns.innerHTML = sortOptions.map(o => {
+      const active = teamSortBy === o.key;
+      return `<button onclick="setTeamSort('${o.key}')" style="padding:3px 10px;font-size:11px;border-radius:5px;border:1px solid var(--border);cursor:pointer;transition:all .15s;background:${active?'var(--text)':'transparent'};color:${active?'var(--bg)':'var(--text2)'};">${o.label}</button>`;
+    }).join('');
+  }
+
+  const sorted = [...coaches].sort((a, b) => {
+    if (teamSortBy === 'name') return a.name.localeCompare(b.name);
+    if (teamSortBy === 'totalSessions') return b.totalSessions - a.totalSessions;
+    return b.passRate - a.passRate; // default
+  });
+
   const grid = document.getElementById('coaches-grid');
-  grid.innerHTML = coaches.map(c => {
+  grid.innerHTML = sorted.map(c => {
     const hc = healthClass(c.passRate);
     const rc = passRateClass(c.passRate);
     const spClr = hc === 'pass' ? 'var(--pass-dot)' : hc === 'needs' ? 'var(--needs-dot)' : 'var(--fail-dot)';
@@ -2206,6 +2231,12 @@ let coachProfileTab = 'sessions';
 function switchCoachTab(tab) {
   coachProfileTab = tab;
   renderCoachProfile(state.coachId);
+}
+
+let teamSortBy = 'passRate';
+function setTeamSort(key) {
+  teamSortBy = key;
+  renderTeamBoard();
 }
 let insightsDateFrom = '2026-02-25';
 let insightsDateTo   = '2026-04-23';
