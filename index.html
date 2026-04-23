@@ -3047,12 +3047,11 @@ function renderInsightsPanel() {
               <div class="bc-name">${myBehavior.name}</div>
             </div>
           </div>
-          <div class="bc-summary">${myBehavior.summary}</div>
+          <div class="bc-pattern" style="margin-bottom:14px">${myBehavior.summary}</div>
           <div class="behavior-tags">
             ${myBehavior.strengths.map(s=>`<span class="btag strength">${s}</span>`).join('')}
-            ${myBehavior.gaps.map(g=>`<span class="btag gap">${g}</span>`).join('')}
+            ${(myBehavior.improvements||[]).map(g=>`<span class="btag gap">${g}</span>`).join('')}
           </div>
-          <div class="bc-pattern">${myBehavior.pattern.replace(/(["""].+?["""])/g,'<em>$1</em>')}</div>
         </div>
       `;
       return;
@@ -3072,12 +3071,11 @@ function renderInsightsPanel() {
                 <div class="bc-name">${b.name}</div>
               </div>
             </div>
-            <div class="bc-summary">${b.summary}</div>
+            <div class="bc-pattern" style="margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden">${b.summary}</div>
             <div class="behavior-tags">
               ${b.strengths.map(s=>`<span class="btag strength">${s}</span>`).join('')}
-              ${b.gaps.map(g=>`<span class="btag gap">${g}</span>`).join('')}
+              ${(b.improvements||[]).map(g=>`<span class="btag gap">${g}</span>`).join('')}
             </div>
-            <div class="bc-pattern">${b.pattern.replace(/(["""].+?["""])/g,'<em>$1</em>')}</div>
           </div>
         `).join('')}
       </div>
