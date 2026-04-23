@@ -2107,7 +2107,7 @@ function renderInsights() {
     </div>
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
-      <button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>
+      ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>` : ''}
       <button class="ins-tab ${insightsSubTab==='lastcall'?'active':''}" onclick="switchInsightsTab('lastcall')">Last Call</button>
       <button class="ins-tab ${insightsSubTab==='students'?'active':''}" onclick="switchInsightsTab('students')">Students</button>
     </div>
@@ -3073,24 +3073,22 @@ function renderUpload() {
 
     <div class="section-head" style="margin-bottom:14px">Recent Uploads</div>
     <div class="card" style="padding:0;overflow:hidden">
-      <div class="tracker-header-row" style="grid-template-columns:2fr 1fr 1fr 1fr 80px">
-        <div>Session</div>
-        <div>Coach</div>
-        <div>Date</div>
-        <div>Status</div>
-        <div></div>
-      </div>
-      ${recentUploads.map(u=>`
-        <div class="tracker-row" style="grid-template-columns:2fr 1fr 1fr 1fr 80px">
-          <div style="font-weight:600;color:var(--text)">${u.title}</div>
-          <div style="color:var(--text2)">${u.coach}</div>
-          <div style="color:var(--text2)">${u.date}</div>
-          <div><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${u.status==='READY'?'#10b98120':u.status==='ANALYSING'?'#6366f120':'#ef444420'};color:${u.status==='READY'?'var(--pass)':u.status==='ANALYSING'?'var(--accent)':'var(--fail)'}">${u.status}</span></div>
-          <div>
-            ${u.status==='READY'?`<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="navigate('recording','${u.coachId}','${u.sessionId}')">View</button>`:`<span style="font-size:11px;color:var(--text2)">${u.status==='ANALYSING'?'Processing…':''}</span>`}
-          </div>
-        </div>
-      `).join('')}
+      <table class="tracker-tbl">
+        <thead>
+          <tr><th>Session</th><th>Coach</th><th>Date</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          ${recentUploads.map(u=>`
+            <tr>
+              <td style="font-weight:600;color:var(--text)">${u.title}</td>
+              <td style="color:var(--text2)">${u.coach}</td>
+              <td style="color:var(--text2);white-space:nowrap">${u.date}</td>
+              <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${u.status==='READY'?'#10b98120':u.status==='ANALYSING'?'#6366f120':'#ef444420'};color:${u.status==='READY'?'var(--pass)':u.status==='ANALYSING'?'var(--accent)':'var(--fail)'}">${u.status}</span></td>
+              <td>${u.status==='READY'?`<button class="btn btn-outline" style="font-size:11px;padding:4px 10px" onclick="navigate('recording','${u.coachId}','${u.sessionId}')">View</button>`:`<span style="font-size:11px;color:var(--text2)">${u.status==='ANALYSING'?'Processing…':''}</span>`}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
     </div>
   `;
 }
