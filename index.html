@@ -3033,11 +3033,11 @@ function renderNav() {
     avatarBadge.textContent = 'Admin';
     avatarBadge.style.display = '';
     links.innerHTML = `
-      <button class="nav-link ${state.page==='insights' ? 'active' : ''}"
-        onclick="navigate('insights')">Insights</button>
       <div class="nav-section-label">Admin</div>
       <button class="nav-link ${['team','coach'].includes(state.page) ? 'active' : ''}"
         onclick="navigate('team')">Coaches</button>
+      <button class="nav-link ${state.page==='insights' ? 'active' : ''}"
+        onclick="navigate('insights')">Insights</button>
       <button class="nav-link ${state.page==='comparisons' ? 'active' : ''}"
         onclick="navigate('comparisons')">Compare</button>
       <button class="nav-link ${state.page==='tracker' ? 'active' : ''}"
