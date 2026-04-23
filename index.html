@@ -1634,6 +1634,25 @@ function renderCoachProfile(coachId) {
   const rateColor = hc === 'pass' ? 'pass' : hc === 'needs' ? 'needs' : 'fail';
   const spClr = hc === 'pass' ? 'var(--pass-dot)' : hc === 'needs' ? 'var(--needs-dot)' : 'var(--fail-dot)';
 
+  /* ── tab bar ── */
+  const tabs = [
+    { key: 'sessions', label: 'Sessions' },
+    { key: 'insights', label: 'Insights' },
+    { key: 'compass',  label: 'Compass'  },
+  ];
+  const tabBarHtml = `
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px">
+      ${tabs.map(t => {
+        const active = coachProfileTab === t.key;
+        return `<button onclick="switchCoachTab('${t.key}')"
+          style="padding:8px 18px;font-size:13px;font-weight:${active?600:500};border:none;background:none;
+          cursor:pointer;color:${active?'var(--text)':'var(--text2)'};
+          border-bottom:2px solid ${active?'var(--text)':'transparent'};margin-bottom:-1px;transition:color .15s">
+          ${t.label}</button>`;
+      }).join('')}
+    </div>`;
+
+  /* ── sessions tab ── */
   const sessionsHtml = c.sessions.map(s => {
     const isBenchmark = s.id === benchmarkSessionId;
     return `
@@ -1649,39 +1668,7 @@ function renderCoachProfile(coachId) {
     </div>`;
   }).join('');
 
-  const compassDims = compassData[coachId] || [];
-  const compassHtml = compassDims.length ? `
-    <div class="compass-section">
-      <div class="compass-title">Coach Compass</div>
-      <div class="compass-sub">AI-measured coaching quality across 5 dimensions (scored 1–5)</div>
-      ${compassDims.map(d => {
-        const pct = (d.score / 5) * 100;
-        const clr = d.score >= 4 ? 'var(--pass)' : d.score >= 3 ? 'var(--needs)' : 'var(--fail)';
-        return `<div class="compass-dim">
-          <div class="compass-dim-lbl">${d.dim}</div>
-          <div class="compass-bar-track">
-            <div class="compass-bar-fill" style="width:${pct.toFixed(1)}%;background:${clr}"></div>
-          </div>
-          <div class="compass-score" style="color:${clr}">${d.score.toFixed(1)}</div>
-        </div>`;
-      }).join('')}
-    </div>` : '';
-
-  document.getElementById('coach-profile-body').innerHTML = `
-    <div class="breadcrumb">
-      <span class="bc-link" onclick="navigate('team')">← Team</span>
-      <span class="bc-sep">/</span>
-      <span class="bc-curr">${c.name}</span>
-    </div>
-
-    <div class="coach-welcome" style="margin-bottom:28px">
-      <div class="welcome-avatar" style="background:${c.color}">${c.initials}</div>
-      <div>
-        <div class="page-title">${c.name}</div>
-        <div class="page-sub">${c.role} &nbsp;·&nbsp; ${c.totalSessions} sessions recorded</div>
-      </div>
-    </div>
-
+  const statsRow = `
     <div class="stats-row">
       <div class="stat-box">
         <div class="stat-lbl">Pass Rate</div>
@@ -1703,13 +1690,140 @@ function renderCoachProfile(coachId) {
         <div class="stat-val" style="padding-top:4px">${sparkline(c.trend, spClr, 80, 32)}</div>
         <div class="stat-hint">${c.trend[0]}% → ${c.trend[c.trend.length-1]}%</div>
       </div>
+    </div>`;
+
+  const sessionsTabHtml = `
+    ${statsRow}
+    <div class="section-head">Sessions</div>
+    <div class="session-list">${sessionsHtml}</div>`;
+
+  /* ── insights tab ── */
+  const passCount = c.sessions.filter(s => s.grade === 'PASS').length;
+  const failCount = c.sessions.length - passCount;
+  const beh = behaviorData.find(b => b.id === coachId);
+
+  const insightsTabHtml = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <!-- Pass rate trend chart -->
+      <div class="stat-box" style="padding:18px 20px">
+        <div class="stat-lbl" style="margin-bottom:10px">Pass Rate — 8-Week Trend</div>
+        <svg viewBox="0 0 260 70" width="100%" height="70" style="overflow:visible">
+          ${yAxisLines(70, 70)}
+          ${axisLabels(['Feb 25','Mar 4','Mar 11','Mar 18','Mar 25','Apr 1','Apr 8','Apr 15'], 260, 70)}
+          ${svgLine(c.trend, spClr, 260, 70, true)}
+          ${c.trend.map((v,i)=>{
+            const x = (i/(c.trend.length-1))*258+1;
+            const mn = Math.min(...c.trend), mx = Math.max(...c.trend), rng=mx-mn||1;
+            const y = 70-4-((v-mn)/rng)*(70-12)+2;
+            return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${spClr}" stroke="var(--bg)" stroke-width="1.5"/>`;
+          }).join('')}
+        </svg>
+        <div style="font-size:11px;color:var(--text2);margin-top:6px">
+          Latest: <strong style="color:${spClr}">${c.trend[c.trend.length-1]}%</strong>
+          &nbsp;·&nbsp; Peak: <strong>${Math.max(...c.trend)}%</strong>
+        </div>
+      </div>
+
+      <!-- Pass / Fail donut -->
+      <div class="stat-box" style="padding:18px 20px;display:flex;flex-direction:column;align-items:center">
+        <div class="stat-lbl" style="margin-bottom:10px;align-self:flex-start">Session Outcomes</div>
+        <div style="position:relative;width:130px;height:130px">
+          <canvas id="cp-donut-${c.id}" width="130" height="130"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+            <div style="font-size:22px;font-weight:700;color:var(--text)">${c.passRate}%</div>
+            <div style="font-size:10px;color:var(--text2)">pass rate</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:12px">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pass-dot);display:inline-block"></span>Pass ${passCount}</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--fail-dot);display:inline-block"></span>Fail ${failCount}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="section-head">Sessions</div>
-    <div class="session-list">${sessionsHtml}</div>
+    ${beh ? `
+    <!-- Behavioral pattern -->
+    <div class="stat-box" style="padding:18px 20px;margin-bottom:16px">
+      <div class="stat-lbl" style="margin-bottom:6px">Coaching Patterns</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">${beh.pattern}</div>
+      ${beh.strengths.length ? `
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--text2);margin-right:2px">Strengths:</span>
+        ${beh.strengths.map(s=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(16,185,129,.12);color:var(--pass)">${s}</span>`).join('')}
+      </div>` : ''}
+      ${beh.gaps.length ? `
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <span style="font-size:11px;color:var(--text2);margin-right:2px">Watch:</span>
+        ${beh.gaps.map(g=>`<span style="font-size:11px;padding:2px 9px;border-radius:20px;background:rgba(239,68,68,.1);color:var(--fail)">${g}</span>`).join('')}
+      </div>` : ''}
+    </div>` : ''}`;
 
-    ${compassHtml}
+  /* ── compass tab ── */
+  const compassDims = compassData[coachId] || [];
+  const compassTabHtml = compassDims.length ? `
+    <div class="compass-section">
+      <div class="compass-title">Coach Compass</div>
+      <div class="compass-sub">AI-measured coaching quality across 5 dimensions (scored 1–5)</div>
+      ${compassDims.map(d => {
+        const pct = (d.score / 5) * 100;
+        const clr = d.score >= 4 ? 'var(--pass)' : d.score >= 3 ? 'var(--needs)' : 'var(--fail)';
+        return `<div class="compass-dim">
+          <div class="compass-dim-lbl">${d.dim}</div>
+          <div class="compass-bar-track">
+            <div class="compass-bar-fill" style="width:${pct.toFixed(1)}%;background:${clr}"></div>
+          </div>
+          <div class="compass-score" style="color:${clr}">${d.score.toFixed(1)}</div>
+        </div>`;
+      }).join('')}
+    </div>` : `<div style="color:var(--text2);font-size:13px;padding:40px 0;text-align:center">No compass data available for this coach yet.</div>`;
+
+  const tabContent = coachProfileTab === 'sessions' ? sessionsTabHtml
+    : coachProfileTab === 'insights' ? insightsTabHtml
+    : compassTabHtml;
+
+  document.getElementById('coach-profile-body').innerHTML = `
+    <div class="breadcrumb">
+      <span class="bc-link" onclick="navigate('team')">← Team</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-curr">${c.name}</span>
+    </div>
+
+    <div class="coach-welcome" style="margin-bottom:20px">
+      <div class="welcome-avatar" style="background:${c.color}">${c.initials}</div>
+      <div>
+        <div class="page-title">${c.name}</div>
+        <div class="page-sub">${c.role} &nbsp;·&nbsp; ${c.totalSessions} sessions recorded</div>
+      </div>
+    </div>
+
+    ${tabBarHtml}
+    ${tabContent}
   `;
+
+  /* ── Chart.js: pass/fail donut (insights tab only) ── */
+  if (coachProfileTab === 'insights') {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`cp-donut-${c.id}`);
+      if (!el || !window.Chart) return;
+      new Chart(el, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [passCount, failCount],
+            backgroundColor: ['var(--pass-dot)', 'var(--fail-dot)'],
+            borderWidth: 0,
+            hoverOffset: 4,
+          }]
+        },
+        options: {
+          cutout: '72%',
+          responsive: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          animation: { duration: 350 },
+        }
+      });
+    });
+  }
 }
 
 /* ─── RENDER: MY SESSIONS (coach view) ─────────────────────────── */
@@ -2096,6 +2210,11 @@ function yAxisLines(h, chartH) {
 
 let activeCoachFilters = new Set(coaches.map(c=>c.id));
 let insightsSubTab = 'overview';
+let coachProfileTab = 'sessions';
+function switchCoachTab(tab) {
+  coachProfileTab = tab;
+  renderCoachProfile(state.coachId);
+}
 let insightsDateFrom = '2026-02-25';
 let insightsDateTo   = '2026-04-23';
 let adminTrendMode = 'wk';
@@ -2951,6 +3070,7 @@ function navigate(page, coachId, sessionId) {
     renderTeamBoard();
   } else if (page === 'coach') {
     document.getElementById('page-coach').classList.add('active');
+    coachProfileTab = 'sessions';
     renderCoachProfile(state.coachId);
   } else if (page === 'sessions') {
     document.getElementById('page-sessions').classList.add('active');
