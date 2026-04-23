@@ -318,7 +318,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 24px 24px 20px;
+      padding: 16px 18px 14px;
       cursor: pointer;
       transition: all .2s;
       position: relative;
@@ -344,7 +344,7 @@
       display: flex;
       align-items: center;
       gap: 11px;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
     .cc-avatar {
       width: 40px; height: 40px;
@@ -360,33 +360,26 @@
     }
     .cc-role { font-size: 12px; color: var(--text2); margin-top: 1px; }
 
-    .cc-rate {
-      display: flex;
-      align-items: baseline;
-      gap: 3px;
-      margin-bottom: 2px;
+    .cc-rate-inline {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0;
     }
-    .cc-rate-num {
-      font-size: 48px;
+    .cc-rate-inline-num {
+      font-size: 22px;
       font-weight: 700;
       line-height: 1;
-      letter-spacing: -2px;
+      letter-spacing: -0.5px;
     }
-    .cc-rate-pct {
-      font-size: 20px;
-      font-weight: 400;
-      color: var(--text2);
-      padding-bottom: 5px;
-    }
-    .cc-rate-lbl {
-      font-size: 11px; font-weight: 700;
-      letter-spacing: .06em; text-transform: uppercase;
+    .cc-rate-inline-lbl {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: .05em; text-transform: uppercase;
       color: var(--text3);
-      margin-bottom: 14px;
+      margin-top: 2px;
     }
-    .cc-pass  .cc-rate-num { color: var(--pass); }
-    .cc-needs .cc-rate-num { color: var(--needs); }
-    .cc-fail  .cc-rate-num { color: var(--fail); }
+    .cc-pass  .cc-rate-inline-num { color: var(--pass); }
+    .cc-needs .cc-rate-inline-num { color: var(--needs); }
+    .cc-fail  .cc-rate-inline-num { color: var(--fail); }
 
     .cc-footer {
       display: flex;
@@ -1612,12 +1605,11 @@ function renderTeamBoard() {
           <div class="cc-name">${c.name}</div>
           <div class="cc-role">${c.role}</div>
         </div>
+        <div class="cc-rate-inline">
+          <div class="cc-rate-inline-num">${c.passRate}%</div>
+          <div class="cc-rate-inline-lbl">Pass Rate</div>
+        </div>
       </div>
-      <div class="cc-rate">
-        <span class="cc-rate-num">${c.passRate}</span>
-        <span class="cc-rate-pct">%</span>
-      </div>
-      <div class="cc-rate-lbl">Pass Rate</div>
       <div class="cc-footer">
         <div class="cc-sessions"><strong>${c.weekSessions}</strong> sessions this week &nbsp;·&nbsp; <strong>${c.totalSessions}</strong> total</div>
         ${sparkline(c.trend, spClr)}
