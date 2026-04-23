@@ -1304,6 +1304,37 @@ const coaches = [
           {ts:'28:45',text:'Student led the last 15 minutes independently', tag:'pos'},
         ]
       },
+      {
+        id: 'a2', date: 'Apr 17', title: 'Algebraic Thinking', student: 'Sam R.', dur: '44m', grade: 'PASS',
+        summary: 'Strong session. Aisha guided Sam through equation solving with patient questioning. Student arrived at solutions independently in the final third.',
+        criteria: [{name:'Student Progress', score:4},{name:'Coach Effectiveness', score:4},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'2:10',text:'Good progress check — referenced prior homework', tag:'pos'},
+          {ts:'19:00',text:'Effective questioning chain on balancing equations', tag:'pos'},
+          {ts:'38:20',text:'Student solved final problem without prompting', tag:'pos'},
+        ]
+      },
+      {
+        id: 'a3', date: 'Apr 14', title: 'Science Inquiry', student: 'Mia B.', dur: '40m', grade: 'FAIL',
+        summary: 'Aisha struggled to scaffold the science concepts effectively. Several key questions were answered directly when the student needed guiding prompts instead.',
+        criteria: [{name:'Student Progress', score:2},{name:'Coach Effectiveness', score:3},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'0:50',text:'Progress check was very brief', tag:'note'},
+          {ts:'11:30',text:'Gave direct answer on cell division — missed opportunity', tag:'neg'},
+          {ts:'26:00',text:'Good recovery with open question about photosynthesis', tag:'pos'},
+          {ts:'37:00',text:'No clear documented next steps at close', tag:'neg'},
+        ]
+      },
+      {
+        id: 'a4', date: 'Apr 11', title: 'Creative Writing', student: 'Jade W.', dur: '38m', grade: 'PASS',
+        summary: 'Aisha used imaginative prompts to draw out the student\'s narrative voice. Session had excellent energy and strong Socratic moments.',
+        criteria: [{name:'Student Progress', score:4},{name:'Coach Effectiveness', score:4},{name:'Interaction Dynamics', score:5}],
+        markers: [
+          {ts:'3:30',text:'Engaging warm-up prompt', tag:'pos'},
+          {ts:'15:00',text:'Great: "What does your character want most?"', tag:'pos'},
+          {ts:'32:00',text:'Student wrote independently for 10 minutes', tag:'pos'},
+        ]
+      },
     ]
   },
   {
@@ -1339,6 +1370,26 @@ const coaches = [
           {ts:'33:10',text:'Reverted to explaining rather than asking near the end', tag:'neg'},
         ]
       },
+      {
+        id: 'm3', date: 'Apr 13', title: 'Science Inquiry', student: 'Chloe F.', dur: '39m', grade: 'FAIL',
+        summary: 'Marcus front-loaded the session with explanations of the scientific method without prompting the student to discover it. Progress check absent.',
+        criteria: [{name:'Student Progress', score:2},{name:'Coach Effectiveness', score:2},{name:'Interaction Dynamics', score:3}],
+        markers: [
+          {ts:'0:30',text:'No progress check at start', tag:'neg'},
+          {ts:'8:00',text:'Explained hypothesis formation directly', tag:'neg'},
+          {ts:'22:30',text:'Student asked a question — coach answered instead of redirecting', tag:'neg'},
+        ]
+      },
+      {
+        id: 'm4', date: 'Apr 10', title: 'Creative Writing', student: 'Bea T.', dur: '44m', grade: 'PASS',
+        summary: 'One of Marcus\'s stronger sessions. Open-ended prompts encouraged creative exploration and the student produced original narrative work.',
+        criteria: [{name:'Student Progress', score:3},{name:'Coach Effectiveness', score:3},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'3:00',text:'Light but present progress check', tag:'pos'},
+          {ts:'16:00',text:'Good imaginative prompt led to student breakthrough', tag:'pos'},
+          {ts:'39:00',text:'Wrapped up with documented story direction for next session', tag:'pos'},
+        ]
+      },
     ]
   },
   {
@@ -1362,6 +1413,37 @@ const coaches = [
           {ts:'20:00',text:'First half — too much explaining, not enough questioning', tag:'neg'},
           {ts:'28:30',text:'Shifted approach — strong questions in second half', tag:'pos'},
           {ts:'44:00',text:'Clear documented next session goals', tag:'pos'},
+        ]
+      },
+      {
+        id: 'r2', date: 'Apr 18', title: 'Math Problem Solving', student: 'Zoe D.', dur: '47m', grade: 'FAIL',
+        summary: 'Raj defaulted to showing worked examples rather than asking the student to attempt first. The first 20 minutes were largely lecture-style.',
+        criteria: [{name:'Student Progress', score:2},{name:'Coach Effectiveness', score:2},{name:'Interaction Dynamics', score:3}],
+        markers: [
+          {ts:'1:00',text:'Progress check present — good', tag:'pos'},
+          {ts:'7:30',text:'Coach demonstrated solution on whiteboard before student attempted', tag:'neg'},
+          {ts:'24:00',text:'Student appeared disengaged', tag:'neg'},
+          {ts:'41:00',text:'Ended without documented next steps', tag:'neg'},
+        ]
+      },
+      {
+        id: 'r3', date: 'Apr 15', title: 'Reading Comprehension', student: 'Arlo P.', dur: '44m', grade: 'PASS',
+        summary: 'Solid reading session. Raj asked strong inference questions and allowed wait time consistently. Student demonstrated clear comprehension gains.',
+        criteria: [{name:'Student Progress', score:4},{name:'Coach Effectiveness', score:3},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'2:00',text:'Good progress check — referenced prior passage', tag:'pos'},
+          {ts:'13:40',text:'Strong inference question: "Why do you think he hesitated?"', tag:'pos'},
+          {ts:'35:00',text:'Student summarised independently — good sign', tag:'pos'},
+        ]
+      },
+      {
+        id: 'r4', date: 'Apr 12', title: 'Science Inquiry', student: 'Remy S.', dur: '41m', grade: 'PASS',
+        summary: 'Raj used curiosity-driven questioning well in this science session. Student explored the topic with genuine interest.',
+        criteria: [{name:'Student Progress', score:3},{name:'Coach Effectiveness', score:3},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'3:00',text:'Brief but present progress check', tag:'pos'},
+          {ts:'16:00',text:'Good: "What do you think would happen if…"', tag:'pos'},
+          {ts:'33:00',text:'Session wrapped with next experiment idea documented', tag:'pos'},
         ]
       },
     ]
@@ -1388,6 +1470,37 @@ const coaches = [
           {ts:'12:40',text:'Student seemed disengaged for extended period', tag:'neg'},
           {ts:'22:00',text:'Brief improvement — asked "what could we try here?"', tag:'pos'},
           {ts:'32:00',text:'No wrap-up or next steps documented', tag:'neg'},
+        ]
+      },
+      {
+        id: 't2', date: 'Apr 17', title: 'Reading Comprehension', student: 'Iris M.', dur: '38m', grade: 'FAIL',
+        summary: 'Tom read passages aloud to the student instead of letting the student lead. Questions were mostly closed (yes/no) with little wait time.',
+        criteria: [{name:'Student Progress', score:1},{name:'Coach Effectiveness', score:2},{name:'Interaction Dynamics', score:3}],
+        markers: [
+          {ts:'0:40',text:'No progress check', tag:'neg'},
+          {ts:'9:00',text:'Read passage aloud — student disengaged', tag:'neg'},
+          {ts:'20:00',text:'Only asked "Does that make sense?" — no probing', tag:'neg'},
+          {ts:'35:00',text:'Session ended abruptly without recap', tag:'neg'},
+        ]
+      },
+      {
+        id: 't3', date: 'Apr 14', title: 'Creative Writing', student: 'Jack F.', dur: '36m', grade: 'PASS',
+        summary: 'One of Tom\'s better sessions. His warm, energetic tone helped the student open up creatively. Questions were more open-ended than usual.',
+        criteria: [{name:'Student Progress', score:3},{name:'Coach Effectiveness', score:3},{name:'Interaction Dynamics', score:4}],
+        markers: [
+          {ts:'2:00',text:'Light check-in — student reminded of last story idea', tag:'pos'},
+          {ts:'11:00',text:'"What happens next?" — student excited to answer', tag:'pos'},
+          {ts:'30:00',text:'Student wrote a full paragraph independently', tag:'pos'},
+        ]
+      },
+      {
+        id: 't4', date: 'Apr 11', title: 'Science Inquiry', student: 'Penny L.', dur: '37m', grade: 'FAIL',
+        summary: 'Tom explained all concepts before asking questions. The student had no opportunity to form hypotheses independently. Standard issues present.',
+        criteria: [{name:'Student Progress', score:1},{name:'Coach Effectiveness', score:2},{name:'Interaction Dynamics', score:3}],
+        markers: [
+          {ts:'0:30',text:'Jumped straight into content with no check-in', tag:'neg'},
+          {ts:'8:00',text:'Explained water cycle fully then asked if student understood', tag:'neg'},
+          {ts:'28:00',text:'Student nodded along but did not contribute meaningfully', tag:'neg'},
         ]
       },
     ]
@@ -1557,6 +1670,16 @@ function filterSessionsByDate(sessions) {
     if (to   && d > to)   return false;
     return true;
   });
+}
+
+function getSessionSubject(title) {
+  const t = title.toLowerCase();
+  if (/math|algebra|geometry|arithmetic|calculus|number|fraction|equation/.test(t)) return 'Math';
+  if (/reading|comprehension|literacy|workshop/.test(t)) return 'Reading';
+  if (/writing|essay|creative|narrative/.test(t)) return 'Writing';
+  if (/science|biology|chemistry|physics|inquiry/.test(t)) return 'Science';
+  if (/history|social studies|geography|discussion/.test(t)) return 'History';
+  return 'Other';
 }
 
 function gradeClass(grade) {
@@ -2548,6 +2671,7 @@ function renderInsights() {
     <div class="insights-tabs">
       <button class="ins-tab ${insightsSubTab==='overview'?'active':''}" onclick="switchInsightsTab('overview')">Overview</button>
       ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='behaviors'?'active':''}" onclick="switchInsightsTab('behaviors')">Behavioral Patterns</button>` : ''}
+      ${!isCoach ? `<button class="ins-tab ${insightsSubTab==='subjects'?'active':''}" onclick="switchInsightsTab('subjects')">By Subject</button>` : ''}
       <button class="ins-tab ${insightsSubTab==='students'?'active':''}" onclick="switchInsightsTab('students')">Students</button>
     </div>
     <div id="ins-panel"></div>
@@ -3275,6 +3399,77 @@ function renderInsightsPanel() {
             }).join('')}
           </svg>`;
         })()}
+      </div>
+    `;
+  }
+
+  else if (insightsSubTab === 'subjects') {
+    // Build per-coach, per-subject pass/fail tallies from date-filtered sessions
+    const ALL_SUBJECTS = ['Math','Reading','Writing','Science','History'];
+
+    const rows = coaches.map(c => {
+      const fs = filterSessionsByDate(c.sessions);
+      const bySubject = {};
+      fs.forEach(s => {
+        const subj = getSessionSubject(s.title);
+        if (!bySubject[subj]) bySubject[subj] = {pass:0,fail:0};
+        if (s.grade === 'PASS') bySubject[subj].pass++;
+        else bySubject[subj].fail++;
+      });
+      return { coach: c, bySubject };
+    });
+
+    // Determine which subjects have any data at all (in this date range)
+    const activeSubjects = ALL_SUBJECTS.filter(subj => rows.some(r => r.bySubject[subj]));
+
+    const cellHtml = (data) => {
+      if (!data) return `<td style="text-align:center;color:var(--text2);font-size:12px">—</td>`;
+      const total = data.pass + data.fail;
+      const rate = Math.round((data.pass / total) * 100);
+      const col = rate >= 75 ? 'var(--pass)' : rate >= 55 ? 'var(--needs)' : 'var(--fail)';
+      const bg  = rate >= 75 ? 'var(--pass-bg)' : rate >= 55 ? 'rgba(245,158,11,.1)' : 'var(--fail-bg)';
+      return `
+        <td style="text-align:center;padding:10px 8px">
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:3px">
+            <span style="font-size:13px;font-weight:700;color:${col};background:${bg};padding:2px 10px;border-radius:20px;min-width:44px;display:inline-block;text-align:center">${rate}%</span>
+            <span style="font-size:10px;color:var(--text2)">${data.pass}P / ${data.fail}F</span>
+          </div>
+        </td>`;
+    };
+
+    el.innerHTML = `
+      <div class="section-head" style="margin-bottom:16px">Pass Rate by Subject</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:18px">Pass and fail counts per coach per subject, for the selected date range. Click a coach to open their profile.</p>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border)">
+              <th style="text-align:left;padding:8px 12px 10px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap">Coach</th>
+              ${activeSubjects.map(s=>`<th style="text-align:center;padding:8px 12px 10px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em">${s}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((row,i)=>{
+              const c = row.coach;
+              return `
+              <tr style="border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''" onclick="navigate('coach','${c.id}')">
+                <td style="padding:10px 12px;white-space:nowrap">
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <div style="width:28px;height:28px;border-radius:50%;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${c.initials}</div>
+                    <span style="font-size:13px;font-weight:600;color:var(--text)">${c.name}</span>
+                  </div>
+                </td>
+                ${activeSubjects.map(subj => cellHtml(row.bySubject[subj])).join('')}
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--pass-bg);color:var(--pass);padding:1px 8px;border-radius:10px;font-weight:600">75%+</span> Pass</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:rgba(245,158,11,.1);color:var(--needs);padding:1px 8px;border-radius:10px;font-weight:600">55–74%</span> Needs improvement</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="background:var(--fail-bg);color:var(--fail);padding:1px 8px;border-radius:10px;font-weight:600">&lt;55%</span> At risk</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)"><span style="color:var(--text2)">—</span> No sessions in range</div>
       </div>
     `;
   }
