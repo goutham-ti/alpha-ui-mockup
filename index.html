@@ -58,88 +58,62 @@
   /* ── Base ── */
   body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-  /* ── Sidenav wrapper (rail + panel = one unit) ── */
+  /* ── Sidebar (single, labeled, always visible) ── */
   #sidenav {
-    display: flex; flex-direction: row; flex-shrink: 0;
-    position: sticky; top: 0; height: 100vh; z-index: 40;
-  }
-
-  /* ── Icon rail ── */
-  #sidebar {
-    width: var(--rail); flex-shrink: 0; background: var(--brand);
-    display: flex; flex-direction: column; align-items: center;
-    height: 100%; overflow: hidden;
-    padding: 10px 0; gap: 2px;
-  }
-  .rail-logo {
-    width: 32px; height: 32px; background: rgba(255,255,255,0.12);
-    border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; margin-bottom: 10px;
-    letter-spacing: -0.5px;
-  }
-  .rail-spacer { flex: 1; }
-  .rail-icon {
-    width: 38px; height: 38px; border-radius: var(--radius);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; color: rgba(255,255,255,0.5);
-    transition: background 140ms var(--ease-out), color 140ms var(--ease-out);
-    border: none; background: none; position: relative; flex-shrink: 0;
-  }
-  .rail-icon:hover { background: rgba(255,255,255,0.12); color: #fff; }
-  .rail-icon.active { background: rgba(255,255,255,0.18); color: #fff; }
-  /* Inactive icons: bright enough to read */
-  #rail-icons .rail-icon { color: rgba(255,255,255,0.55); }
-  #rail-icons .rail-icon.active { color: #fff; }
-  .rail-icon.active::before {
-    content: ''; position: absolute; left: -3px; top: 50%; transform: translateY(-50%);
-    width: 3px; height: 18px; background: #fff; border-radius: 0 2px 2px 0;
-  }
-  .rail-avatar {
-    width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.15);
-    display: flex; align-items: center; justify-content: center; font-size: 10px;
-    font-weight: 700; color: #fff; flex-shrink: 0; cursor: pointer;
-    border: 1.5px solid rgba(255,255,255,0.25); margin-top: 4px;
-    transition: border-color 140ms var(--ease-out);
-  }
-  .rail-avatar:hover { border-color: rgba(255,255,255,0.6); }
-  .rail-badge {
-    position: absolute; top: 4px; right: 4px; width: 7px; height: 7px;
-    border-radius: 50%; background: var(--red); border: 1.5px solid var(--brand);
-  }
-
-  /* ── Secondary nav panel ── */
-  #nav-panel {
-    width: var(--panel); flex-shrink: 0; background: var(--surface);
+    width: 230px; flex-shrink: 0; background: var(--surface);
     border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
-    height: 100%; overflow-y: auto;
-    transition: width 180ms var(--ease-drawer), opacity 180ms var(--ease-out);
+    position: sticky; top: 0; height: 100vh; overflow: hidden; z-index: 40;
   }
-  #nav-panel.collapsed { width: 0; opacity: 0; overflow: hidden; }
-  .panel-header {
-    padding: 14px 14px 6px; border-bottom: 1px solid var(--border-subtle);
-    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 9px; padding: 14px 16px 13px;
+    border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;
   }
-  .panel-user-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .panel-user-role { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 1px; }
-  .panel-nav { flex: 1; padding: 8px 8px; overflow-y: auto; }
+  .sidebar-brand .mark {
+    width: 28px; height: 28px; background: var(--brand); border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center; color: #fff;
+    font-weight: 700; font-size: 13px; flex-shrink: 0; letter-spacing: -0.5px;
+  }
+  .sidebar-brand .word { font-size: 13.5px; font-weight: 700; letter-spacing: -0.2px; color: var(--text); }
+  .sidebar-brand .badge {
+    font-size: 8px; font-weight: 700; font-family: var(--font-mono); color: var(--text-3);
+    border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; letter-spacing: 0.06em; margin-left: 2px;
+  }
+  .panel-nav { flex: 1; padding: 8px; overflow-y: auto; }
   .nav-group-label {
     font-size: 9px; font-weight: 600; color: var(--text-3);
     letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 12px 6px 4px; font-family: var(--font-mono);
+    padding: 14px 8px 5px; font-family: var(--font-mono);
   }
   .nav-item {
-    display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: var(--radius-sm);
-    color: var(--text-2); font-size: 12.5px; font-weight: 400; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; padding: 7px 9px; border-radius: var(--radius-sm);
+    color: var(--text-2); font-size: 12.5px; font-weight: 500; cursor: pointer;
     transition: background 120ms var(--ease-out), color 120ms var(--ease-out);
     margin-bottom: 1px; border: none; background: none; width: 100%; text-align: left;
     white-space: nowrap;
   }
   .nav-item:hover { background: var(--surface-2); color: var(--text); }
-  .nav-item.active { background: var(--surface-2); color: var(--brand); font-weight: 600; }
-  .nav-item svg { flex-shrink: 0; color: var(--text-3); }
+  .nav-item.active { background: #EEF2F9; color: var(--brand); font-weight: 600; }
+  .nav-item svg { flex-shrink: 0; color: var(--text-3); width: 16px; height: 16px; }
+  .nav-item:hover svg { color: var(--text-2); }
   .nav-item.active svg { color: var(--brand); }
-  .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; border-radius: 8px; padding: 1px 5px; }
+  .nav-item .nav-label { flex: 1; }
+  .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 9px; font-weight: 700; border-radius: 8px; padding: 1px 6px; }
+
+  /* Sidebar footer: settings + user */
+  .sidebar-foot { border-top: 1px solid var(--border-subtle); padding: 8px; flex-shrink: 0; }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: background 120ms var(--ease-out);
+  }
+  .sidebar-user:hover { background: var(--surface-2); }
+  .sidebar-user .avatar {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .sidebar-user .info { flex: 1; min-width: 0; }
+  .sidebar-user .nm { font-size: 12.5px; font-weight: 600; color: var(--text); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-user .rl { font-size: 9.5px; color: var(--text-3); font-family: var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 1px; }
 
   /* ── Role switcher (prototype only) ── */
   #role-bar {
@@ -180,6 +154,13 @@
   .topbar-search input::placeholder { color: var(--text-3); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
   .topbar-date { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); letter-spacing: 0.04em; }
+
+  /* Breadcrumb */
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); min-width: 0; }
+  .breadcrumb .crumb { color: var(--text-3); cursor: pointer; white-space: nowrap; transition: color 120ms; }
+  .breadcrumb .crumb:hover { color: var(--text-2); }
+  .breadcrumb .crumb.current { color: var(--text); font-weight: 600; cursor: default; }
+  .breadcrumb .sep { color: var(--text-3); opacity: 0.5; }
 
   /* Notifications */
   .notif-btn {
@@ -355,15 +336,42 @@
   .session-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
   .session-meta-pill { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-2); }
 
-  /* Tabs */
-  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
-  .tab {
-    padding: 9px 14px; font-size: 12.5px; font-weight: 500; color: var(--text-3);
-    cursor: pointer; border-bottom: 2px solid transparent;
-    transition: color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+  /* ── Session pipeline stepper ── */
+  .pipeline { display: flex; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .pl-step {
+    flex: 1; display: flex; align-items: center; gap: 9px; padding: 11px 16px;
+    cursor: pointer; position: relative; border-right: 1px solid var(--border-subtle);
+    transition: background 140ms var(--ease-out);
   }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+  .pl-step:last-child { border-right: none; }
+  .pl-step:hover { background: var(--surface-2); }
+  .pl-step .dot {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; font-family: var(--font-mono);
+    background: var(--surface-2); color: var(--text-3); border: 1.5px solid var(--border);
+  }
+  .pl-step .pl-label { font-size: 12px; font-weight: 600; color: var(--text-3); line-height: 1.1; }
+  .pl-step .pl-sub { font-size: 9.5px; color: var(--text-3); font-family: var(--font-mono); letter-spacing: 0.04em; margin-top: 1px; }
+  .pl-step.done .dot { background: var(--green); color: #fff; border-color: var(--green); }
+  .pl-step.done .pl-label { color: var(--text-2); }
+  .pl-step.active { background: #EEF2F9; }
+  .pl-step.active .dot { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .pl-step.active .pl-label { color: var(--brand); }
+  .pl-step.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--brand);
+  }
+
+  /* Forward CTA bar under pipeline content */
+  .pipeline-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 16px; margin-top: 16px;
+  }
+  .pipeline-foot .hint { font-size: 11.5px; color: var(--text-3); }
+
+  /* Tabs (kept for free nav, secondary to pipeline) */
+  .tabs { display: none; }
 
   .tab-content { display: none; }
   .tab-content.active { display: grid; grid-template-columns: 1fr 1fr 240px; gap: 14px; }
@@ -551,29 +559,23 @@
   <button class="role-btn" onclick="setRole('student')">Student</button>
 </div>
 
-<!-- Sidenav: rail + panel as one unit -->
+<!-- Sidebar (single, labeled) -->
 <div id="sidenav">
-  <!-- Icon Rail -->
-  <div id="sidebar">
-    <div class="rail-logo">A</div>
-    <div id="rail-icons"></div>
-    <div class="rail-spacer"></div>
-    <div class="rail-icon" onclick="showPage('settings')" title="Settings" id="rail-settings">
-      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
-    </div>
-    <div class="rail-avatar" id="user-initials" title="Profile">DC</div>
+  <div class="sidebar-brand">
+    <div class="mark">A</div>
+    <span class="word">Alpha Coaching</span>
+    <span class="badge">BETA</span>
   </div>
-
-  <!-- Secondary nav panel -->
-  <div id="nav-panel">
-    <div class="panel-header">
-      <div class="student-avatar" id="panel-avatar" style="width:28px;height:28px;font-size:11px;flex-shrink:0;">DC</div>
-      <div>
-        <div class="panel-user-name" id="user-name">Daniela Cruz</div>
-        <div class="panel-user-role" id="user-role-label">Coach · Palm Beach</div>
+  <nav class="panel-nav" id="sidebar-nav"></nav>
+  <div class="sidebar-foot">
+    <div class="sidebar-user" onclick="showPage('settings')">
+      <div class="avatar" id="user-initials">DC</div>
+      <div class="info">
+        <div class="nm" id="user-name">Daniela Cruz</div>
+        <div class="rl" id="user-role-label">Coach · Palm Beach</div>
       </div>
+      <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
     </div>
-    <nav class="panel-nav" id="sidebar-nav"></nav>
   </div>
 </div>
 
@@ -581,12 +583,15 @@
 <div id="main">
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-search">
-      <svg width="13" height="13" fill="none" stroke="#94A3B8" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search students, coaches, sessions…" id="search-input">
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="crumb current">Dashboard</span>
     </div>
     <div class="topbar-right">
-      <div style="font-size:11px; color:var(--text-3)">Jun 10, 2026 · Tue</div>
+      <div class="topbar-search" style="width:230px;">
+        <svg width="13" height="13" fill="none" stroke="#AEAEAA" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search…" id="search-input">
+      </div>
+      <div class="topbar-date">Jun 10 · Tue</div>
 
       <!-- Admin: Viewing-as-coach dropdown -->
       <div id="view-as-coach">
@@ -1353,6 +1358,27 @@
         <div style="font-size:12px; color:var(--text-3);">SUBJECT <strong style="color:var(--text);">Math</strong> &nbsp; APP <strong style="color:var(--text);">Math Academy</strong> &nbsp; LEVEL <strong style="color:var(--text);">L2</strong></div>
       </div>
 
+      <!-- Pipeline stepper -->
+      <div class="pipeline" id="session-pipeline">
+        <div class="pl-step active" id="pl-before" onclick="switchTab('before')">
+          <div class="dot">1</div>
+          <div><div class="pl-label">Before call</div><div class="pl-sub">Prep</div></div>
+        </div>
+        <div class="pl-step" id="pl-during" onclick="switchTab('during')">
+          <div class="dot">2</div>
+          <div><div class="pl-label">During call</div><div class="pl-sub">Live notes</div></div>
+        </div>
+        <div class="pl-step" id="pl-after" onclick="switchTab('after')">
+          <div class="dot">3</div>
+          <div><div class="pl-label">After call</div><div class="pl-sub">Document</div></div>
+        </div>
+        <div class="pl-step" id="pl-qc" onclick="switchTab('qc')" style="display:none;">
+          <div class="dot">4</div>
+          <div><div class="pl-label">QC review</div><div class="pl-sub">Result</div></div>
+        </div>
+      </div>
+
+      <!-- Hidden legacy tabs (kept for switchTab compatibility) -->
       <div class="tabs">
         <div class="tab active" onclick="switchTab('before')">Before call</div>
         <div class="tab" onclick="switchTab('during')">During call</div>
@@ -1725,6 +1751,12 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Forward CTA bar -->
+      <div class="pipeline-foot" id="pipeline-foot">
+        <span class="hint" id="pipeline-hint">Review the prep, then join the call.</span>
+        <button class="btn btn-primary" id="pipeline-cta" onclick="pipelineAdvance()">Join call &amp; start →</button>
       </div>
     </div>
 
@@ -2895,91 +2927,49 @@ const TODAY_SESSIONS = [
 ];
 
 // Rail icon definitions per role
-const RAIL_ICONS = {
-  coach: [
-    { key:'main', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`, label:'Main' },
-    { key:'schedule', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`, label:'Schedule', page:'schedule' },
-    { key:'history', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>`, label:'History', page:'history' },
-    { key:'performance', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`, label:'Performance', page:'performance' },
-  ],
-  guide: [
-    { key:'main', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`, label:'Main' },
-    { key:'people', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`, label:'Students', page:'guide-student' },
-  ],
-  admin: [
-    { key:'main', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`, label:'Main' },
-    { key:'sessions', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`, label:'Sessions', page:'schedule' },
-    { key:'people', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`, label:'People' },
-    { key:'analytics', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>`, label:'Analytics' },
-    { key:'config', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>`, label:'Config' },
-  ],
-  student: [
-    { key:'main', icon: `<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`, label:'Main' },
-  ]
+// Breadcrumb metadata: pageId → [section, title]. Detail pages map to a parent.
+const PAGE_META = {
+  dashboard:        ['Coach', 'Dashboard'],
+  schedule:         ['Coach', 'Schedule'],
+  history:          ['Coach', 'Calls history'],
+  notes:            ['Coach', 'Awaiting notes'],
+  performance:      ['Coach', 'Performance'],
+  settings:         ['Coach', 'Settings'],
+  'session-detail': ['Coach', 'Session'],
+  'session-message':['Coach', 'Messages'],
+  'session-noshow': ['Coach', 'Session · No-show'],
+  'session-cancelled':['Coach', 'Session · Cancelled'],
+  'guide-dashboard':['Guide', 'Dashboard'],
+  'guide-student':  ['Guide', 'Student profile'],
+  'guide-book':     ['Guide', 'Book session'],
+  'guide-booking-confirm':['Guide', 'Booking confirmed'],
+  'admin-overview': ['Admin', 'Overview'],
+  'admin-students': ['Admin', 'Students'],
+  'admin-student-profile':['Admin', 'Student profile'],
+  'admin-coaches':  ['Admin', 'Coaches'],
+  'admin-coach-detail':['Admin', 'Coach detail'],
+  'admin-flags':    ['Admin', 'Student flags'],
+  'admin-notes-report':['Admin', 'Session notes'],
+  'admin-digest':   ['Admin', 'Weekly digest'],
+  'admin-attributes':['Admin', 'Coach attributes'],
+  'admin-routing':  ['Admin', 'Routing config'],
+  'admin-routing-sim':['Admin', 'Routing simulator'],
+  'admin-workflows':['Admin', 'Workflows'],
+  'admin-workflow-edit':['Admin', 'Edit workflow'],
+  'admin-holidays': ['Admin', 'Blocked dates'],
+  'admin-slack':    ['Admin', 'Slack alerts'],
+  'admin-onboard':  ['Admin', 'Add coach'],
+  student:          ['Student', 'My sessions'],
+  'student-book':   ['Student', 'Book a call'],
+  'student-booking-confirm':['Student', 'Booked'],
 };
-
-// Which nav items show for each rail section key
-const RAIL_PANEL = {
-  coach: {
-    main: ['dashboard','notes','performance'],
-    schedule: null,
-    history: null,
-    performance: null,
-  },
-  guide: {
-    main: ['guide-dashboard','guide-student','history'],
-    people: null,
-  },
-  admin: {
-    main: ['admin-overview','schedule'],
-    sessions: null,
-    people: ['admin-students','admin-coaches','admin-flags'],
-    analytics: ['admin-notes-report','admin-digest','performance'],
-    config: ['admin-attributes','admin-routing','admin-routing-sim','admin-workflows','admin-holidays','admin-slack','admin-onboard'],
-  },
-  student: { main: ['student','student-book'] }
-};
-
-let activeRailKey = 'main';
-
-function buildRail(role) {
-  const icons = RAIL_ICONS[role] || [];
-  const container = document.getElementById('rail-icons');
-  if (!container) return;
-  container.innerHTML = '';
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.gap = '2px';
-  icons.forEach(ri => {
-    const btn = document.createElement('button');
-    btn.className = 'rail-icon' + (ri.key === activeRailKey ? ' active' : '');
-    btn.title = ri.label;
-    btn.innerHTML = ri.icon;
-    btn.onclick = () => {
-      if (ri.page) { showPage(ri.page); return; }
-      activeRailKey = ri.key;
-      document.querySelectorAll('.rail-icon').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      buildNav(role);
-    };
-    container.appendChild(btn);
-  });
-}
 
 function buildNav(role) {
   const r = ROLES[role];
   const nav = document.getElementById('sidebar-nav');
   nav.innerHTML = '';
   let lastGroup = undefined;
-
-  // Determine which items to show based on active rail key
-  const panelMap = RAIL_PANEL[role] || {};
-  const allowedIds = panelMap[activeRailKey] || null;
-  const itemsToShow = allowedIds
-    ? r.nav.filter(item => allowedIds.includes(item.id))
-    : r.nav;
-
-  itemsToShow.forEach(item => {
+  r.nav.forEach(item => {
     if (item.group !== lastGroup) {
       if (item.group) {
         const label = document.createElement('div');
@@ -2991,10 +2981,21 @@ function buildNav(role) {
     }
     const btn = document.createElement('button');
     btn.className = 'nav-item' + (item.id === currentPage ? ' active' : '');
-    btn.innerHTML = `${item.icon}<span>${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}`;
+    btn.innerHTML = `${item.icon}<span class="nav-label">${item.label}</span>${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}`;
     btn.onclick = () => showPage(item.id);
     nav.appendChild(btn);
   });
+}
+
+function updateBreadcrumb(pageId) {
+  const bc = document.getElementById('breadcrumb');
+  if (!bc) return;
+  const meta = PAGE_META[pageId] || [ROLES[currentRole].bannerRole, pageId];
+  const home = ROLES[currentRole].defaultPage;
+  bc.innerHTML =
+    `<span class="crumb" onclick="showPage('${home}')">${meta[0]}</span>` +
+    `<span class="sep">/</span>` +
+    `<span class="crumb current">${meta[1]}</span>`;
 }
 
 function buildTodaySessions() {
@@ -3020,15 +3021,11 @@ function buildTodaySessions() {
 
 function setRole(role) {
   currentRole = role;
-  activeRailKey = 'main';
   const r = ROLES[role];
   document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
   const viewAs = document.getElementById('view-as-coach');
   if (viewAs) viewAs.className = role === 'admin' ? 'visible' : '';
-  // Update panel header
-  const pa = document.getElementById('panel-avatar');
-  if (pa) pa.textContent = r.initials;
   document.getElementById('user-initials').textContent = r.initials;
   document.getElementById('user-name').textContent = r.name;
   document.getElementById('user-role-label').textContent = r.roleLabel;
@@ -3037,7 +3034,6 @@ function setRole(role) {
     document.getElementById('welcome-msg').textContent = `Welcome back, ${first}.`;
   }
   currentPage = r.defaultPage;
-  buildRail(role);
   buildNav(role);
   showPage(r.defaultPage, false);
 }
@@ -3048,6 +3044,7 @@ function showPage(pageId, updateNav = true) {
   if (page) page.classList.add('active');
   currentPage = pageId;
   if (updateNav) buildNav(currentRole);
+  updateBreadcrumb(pageId);
   document.querySelector('.content')?.scrollTo(0, 0);
   if (pageId === 'dashboard') buildTodaySessions();
 }
@@ -3058,22 +3055,57 @@ function showSessionDetail() {
 
 function showSessionDetailAfter() {
   showPage('session-detail');
-  // Switch to After tab
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  const afterBtn = document.querySelector('.tab[onclick="switchTab(\'after\')"]');
-  if (afterBtn) afterBtn.classList.add('active');
-  const afterContent = document.getElementById('tab-after');
-  if (afterContent) afterContent.classList.add('active');
+  switchTab('after');
 }
 
+// Pipeline configuration: order + per-step forward CTA
+const PIPE_ORDER = ['before','during','after','qc'];
+const PIPE_CFG = {
+  before: { hint: 'Review the prep, then join the call.', cta: 'Join call &amp; start →', next: 'during' },
+  during: { hint: 'Taking live notes. Wrap up when the call ends.', cta: 'End call &amp; document →', next: 'after' },
+  after:  { hint: 'Document the session, then mark complete.', cta: 'Mark complete →', action: 'markComplete' },
+  qc:     { hint: 'QC analysis complete.', cta: 'Back to schedule →', action: 'backToSchedule' },
+};
+
 function switchTab(tabId) {
+  // tab content
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
   const content = document.getElementById('tab-' + tabId);
   if (content) content.classList.add('active');
+
+  // pipeline stepper: mark prior done, current active, later default
+  const curIdx = PIPE_ORDER.indexOf(tabId);
+  PIPE_ORDER.forEach((step, i) => {
+    const el = document.getElementById('pl-' + step);
+    if (!el) return;
+    el.classList.remove('active','done');
+    if (i < curIdx) el.classList.add('done');
+    else if (i === curIdx) el.classList.add('active');
+  });
+
+  // forward CTA
+  const cfg = PIPE_CFG[tabId];
+  const foot = document.getElementById('pipeline-foot');
+  const hint = document.getElementById('pipeline-hint');
+  const cta = document.getElementById('pipeline-cta');
+  if (cfg && foot && cta) {
+    foot.style.display = 'flex';
+    hint.textContent = cfg.hint.replace(/&amp;/g,'&');
+    cta.innerHTML = cfg.cta;
+  }
 }
+
+function pipelineAdvance() {
+  const active = PIPE_ORDER.find(s => document.getElementById('pl-' + s)?.classList.contains('active')) || 'before';
+  const cfg = PIPE_CFG[active];
+  if (!cfg) return;
+  if (cfg.action === 'markComplete') { markComplete(); return; }
+  if (cfg.action === 'backToSchedule') { showPage('schedule'); return; }
+  if (cfg.next) switchTab(cfg.next);
+}
+
+function backToSchedule() { showPage('schedule'); }
 
 // Notifications
 function toggleNotif() {
@@ -3167,27 +3199,21 @@ function sendMsg() {
 // Unlock QC tab after recording submitted
 function unlockQcTab() {
   const btn = document.getElementById('tab-qc-btn');
-  if (btn) { btn.style.display = 'block'; }
-  switchTabById('qc');
-}
-function switchTabById(tabId) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  const tabBtn = document.getElementById('tab-qc-btn');
-  if (tabBtn) tabBtn.classList.add('active');
-  const content = document.getElementById('tab-' + tabId);
-  if (content) content.classList.add('active');
+  if (btn) btn.style.display = 'block';
+  const plQc = document.getElementById('pl-qc');
+  if (plQc) plQc.style.display = 'flex';
+  switchTab('qc');
 }
 
-// Viewing-as-coach (admin only)
+// Viewing-as-coach (admin only) — reflects in the breadcrumb
 function viewAsCoach(name) {
-  const banner = document.getElementById('role-banner');
-  const bannerName = document.getElementById('banner-name');
-  if (name && bannerName) {
-    bannerName.textContent = name + ' (as admin)';
-    if (banner) banner.style.display = 'flex';
-  } else if (bannerName) {
-    bannerName.textContent = ROLES[currentRole].name;
+  const bc = document.getElementById('breadcrumb');
+  if (!bc) return;
+  if (name) {
+    bc.innerHTML = `<span class="crumb" onclick="showPage('admin-overview')">Admin</span>` +
+      `<span class="sep">/</span><span class="crumb current">Viewing as ${name}</span>`;
+  } else {
+    updateBreadcrumb(currentPage);
   }
 }
 
@@ -3334,9 +3360,9 @@ function sendFullMsg() {
 }
 
 // Init
-buildRail('coach');
 buildNav('coach');
 buildTodaySessions();
+updateBreadcrumb('dashboard');
 setTimeout(updateNextCallBanner, 100);
 </script>
 
