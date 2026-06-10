@@ -39,11 +39,18 @@
     --amber-border: #FDE68A;
     --purple:       #7C3AED;
 
-    /* Layout */
+    /* Surface ladder (Linear: hierarchy by surface + hairline, not shadow) */
+    --surface-3: #EFEFEC;    /* hovered / featured lift */
+    --hairline-strong: #DCDCD8;
+
+    /* Layout — radius discipline: 8px cards, 6px buttons/inputs (Linear md/sm) */
     --rail:   52px;
     --panel:  212px;
-    --radius: 6px;
-    --radius-sm: 4px;
+    --radius: 8px;
+    --radius-sm: 6px;
+
+    /* Focus ring (Linear: 2px accent ring) */
+    --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
 
     /* Typography (DM Sans + system fallback; no Inter) */
     --font:      'DM Sans', -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
@@ -149,7 +156,7 @@
     border-radius: var(--radius-sm); padding: 0 10px; height: 30px; width: 260px;
     transition: border-color 150ms var(--ease-out);
   }
-  .topbar-search:focus-within { border-color: var(--brand); }
+  .topbar-search:focus-within { border-color: var(--accent); box-shadow: var(--focus-ring); }
   .topbar-search input { border: none; background: none; font-size: 12.5px; color: var(--text); outline: none; width: 100%; font-family: var(--font); }
   .topbar-search input::placeholder { color: var(--text-3); }
   .topbar-right { display: flex; align-items: center; gap: 10px; }
@@ -251,7 +258,7 @@
     padding: 12px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
     transition: border-color 140ms var(--ease-out), box-shadow 140ms var(--ease-out), transform 100ms var(--ease-out);
   }
-  .session-card:hover { border-color: #CACAC6; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .session-card:hover { border-color: var(--hairline-strong); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
   .session-card:active { transform: scale(0.995); }
   .session-time { font-size: 11.5px; font-weight: 600; color: var(--text-2); width: 74px; flex-shrink: 0; font-family: var(--font-mono); }
   .session-student { flex: 1; min-width: 0; }
@@ -286,6 +293,7 @@
     transition: background 140ms var(--ease-out), opacity 140ms var(--ease-out), transform 100ms var(--ease-out), box-shadow 140ms var(--ease-out);
   }
   .btn:active { transform: scale(0.97); }
+  .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
   .btn-primary { background: var(--brand); color: #fff; }
   .btn-primary:hover { background: var(--brand-2); }
   .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
@@ -398,7 +406,7 @@
     transition: border-color 140ms var(--ease-out);
     line-height: 1.55;
   }
-  .notes-area:focus { border-color: var(--brand); }
+  .notes-area:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
   .notes-area::placeholder { color: var(--text-3); }
 
   /* Awaiting notes */
@@ -461,7 +469,7 @@
     background: var(--surface);
     transition: border-color 140ms var(--ease-out);
   }
-  .input:focus { border-color: var(--brand); }
+  .input:focus { border-color: var(--accent); box-shadow: var(--focus-ring); }
   .label { font-size: 10.5px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; display: block; }
   .form-row { margin-bottom: 11px; }
 
